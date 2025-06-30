@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,64 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 
+interface Student {
+    id: string;
+    createdAt: string;
+    fullName: string;
+    gender: string;
+    nisn?: string;
+    birthPlace?: string;
+    birthDate?: string; 
+    nik?: string;
+    religion: string;
+    address?: string;
+    rt?: string;
+    rw?: string;
+    dusun?: string;
+    kelurahan?: string;
+    kecamatan?: string;
+    postalCode?: string;
+    residenceType: string;
+    transportMode: string;
+    phone?: string;
+    mobilePhone: string;
+    fatherName: string;
+    fatherBirthYear?: string;
+    fatherEducation?: string;
+    fatherOccupation?: string;
+    fatherIncome?: string;
+    fatherNik?: string;
+    motherName: string;
+    motherBirthYear?: string;
+    motherEducation?: string;
+    motherOccupation?: string;
+    motherIncome?: string;
+    motherNik?: string;
+    guardianName?: string;
+    guardianBirthYear?: string;
+    guardianEducation?: string;
+    guardianOccupation?: string;
+    guardianIncome?: string;
+    guardianNik?: string;
+    kipNumber?: string;
+    kipName?: string;
+    kksPkhNumber?: string;
+    birthCertificateRegNo?: string;
+    previousSchool?: string;
+    childOrder?: string;
+    kkNumber?: string;
+    weight?: string;
+    height?: string;
+    headCircumference?: string;
+    siblingsCount?: string;
+}
+
+interface StudentFormProps {
+  studentToEdit: Student | null;
+  onSuccess: (student?: Student) => void;
+  onCancel: () => void;
+}
+
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Nama lengkap wajib diisi." }),
   gender: z.string({ required_error: "Jenis kelamin wajib dipilih." }),
@@ -58,7 +116,6 @@ const formSchema = z.object({
   phone: z.string().optional(),
   mobilePhone: z.string().min(1, { message: "Nomor HP wajib diisi." }),
 
-  // Data Ayah
   fatherName: z.string().min(1, { message: "Nama Ayah wajib diisi." }),
   fatherBirthYear: z.string().optional(),
   fatherEducation: z.string().optional(),
@@ -66,7 +123,6 @@ const formSchema = z.object({
   fatherIncome: z.string().optional(),
   fatherNik: z.string().optional(),
 
-  // Data Ibu
   motherName: z.string().min(1, { message: "Nama Ibu wajib diisi." }),
   motherBirthYear: z.string().optional(),
   motherEducation: z.string().optional(),
@@ -74,7 +130,6 @@ const formSchema = z.object({
   motherIncome: z.string().optional(),
   motherNik: z.string().optional(),
 
-  // Data Wali
   guardianName: z.string().optional(),
   guardianBirthYear: z.string().optional(),
   guardianEducation: z.string().optional(),
@@ -82,7 +137,6 @@ const formSchema = z.object({
   guardianIncome: z.string().optional(),
   guardianNik: z.string().optional(),
 
-  // Data Tambahan Siswa
   kipNumber: z.string().optional(),
   kipName: z.string().optional(),
   kksPkhNumber: z.string().optional(),
@@ -103,48 +157,79 @@ const educationOptions = ["Tidak Sekolah", "SD", "SMP", "SMA", "D1", "D2", "D3",
 const occupationOptions = ["Tidak Bekerja", "Petani", "Buruh", "PNS", "Wiraswasta", "Lainnya"];
 const incomeOptions = ["< 500rb", "500rb-1jt", "1jt-2jt", "2jt-5jt", "> 5jt", "Tidak Berpenghasilan"];
 
-export default function StudentForm() {
+const defaultFormValues = {
+    fullName: "",
+    gender: undefined,
+    nisn: "",
+    birthPlace: "",
+    birthDate: undefined,
+    nik: "",
+    religion: undefined,
+    address: "",
+    rt: "",
+    rw: "",
+    dusun: "",
+    kelurahan: "",
+    kecamatan: "",
+    postalCode: "",
+    residenceType: undefined,
+    transportMode: undefined,
+    phone: "",
+    mobilePhone: "",
+    fatherName: "",
+    fatherBirthYear: "",
+    fatherEducation: undefined,
+    fatherOccupation: undefined,
+    fatherIncome: undefined,
+    fatherNik: "",
+    motherName: "",
+    motherBirthYear: "",
+    motherEducation: undefined,
+    motherOccupation: undefined,
+    motherIncome: undefined,
+    motherNik: "",
+    guardianName: "",
+    guardianBirthYear: "",
+    guardianEducation: undefined,
+    guardianOccupation: undefined,
+    guardianIncome: undefined,
+    guardianNik: "",
+    kipNumber: "",
+    kipName: "",
+    kksPkhNumber: "",
+    birthCertificateRegNo: "",
+    previousSchool: "",
+    childOrder: "",
+    kkNumber: "",
+    weight: "",
+    height: "",
+    headCircumference: "",
+    siblingsCount: "",
+};
+
+
+export default function StudentForm({ studentToEdit, onSuccess, onCancel }: StudentFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const isEditMode = !!studentToEdit;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      fullName: "",
-      nisn: "",
-      birthPlace: "",
-      nik: "",
-      address: "",
-      rt: "",
-      rw: "",
-      dusun: "",
-      kelurahan: "",
-      kecamatan: "",
-      postalCode: "",
-      phone: "",
-      mobilePhone: "",
-      fatherName: "",
-      fatherBirthYear: "",
-      fatherNik: "",
-      motherName: "",
-      motherBirthYear: "",
-      motherNik: "",
-      guardianName: "",
-      guardianBirthYear: "",
-      guardianNik: "",
-      kipNumber: "",
-      kipName: "",
-      kksPkhNumber: "",
-      birthCertificateRegNo: "",
-      previousSchool: "",
-      childOrder: "",
-      kkNumber: "",
-      weight: "",
-      height: "",
-      headCircumference: "",
-      siblingsCount: "",
-    },
+    defaultValues: defaultFormValues,
   });
+
+  React.useEffect(() => {
+    if (isEditMode && studentToEdit) {
+      const studentData = {
+        ...studentToEdit,
+        birthDate: studentToEdit.birthDate ? new Date(studentToEdit.birthDate) : undefined,
+      };
+      form.reset(studentData);
+    } else {
+      form.reset(defaultFormValues);
+    }
+  }, [studentToEdit, form, isEditMode]);
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -152,16 +237,35 @@ export default function StudentForm() {
       const dataToSave = {
         ...values,
         birthDate: values.birthDate ? values.birthDate.toISOString() : null,
-        createdAt: new Date().toISOString(),
       };
-      await addDoc(collection(db, "siswa"), dataToSave);
-      toast({
-        title: "Sukses!",
-        description: "Data siswa berhasil disimpan.",
-      });
-      form.reset();
+
+      if (isEditMode && studentToEdit) {
+        const studentRef = doc(db, "siswa", studentToEdit.id);
+        await updateDoc(studentRef, dataToSave);
+        toast({
+          title: "Sukses!",
+          description: "Data siswa berhasil diperbarui.",
+        });
+        const updatedStudent: Student = {
+            ...studentToEdit,
+            ...dataToSave,
+            birthDate: dataToSave.birthDate || undefined,
+        }
+        onSuccess(updatedStudent);
+      } else {
+        await addDoc(collection(db, "siswa"), {
+          ...dataToSave,
+          createdAt: new Date().toISOString(),
+        });
+        toast({
+          title: "Sukses!",
+          description: "Data siswa berhasil disimpan.",
+        });
+        form.reset(defaultFormValues);
+        onSuccess();
+      }
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("Error processing document: ", e);
       toast({
         variant: "destructive",
         title: "Gagal!",
@@ -199,7 +303,7 @@ export default function StudentForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Jenis Kelamin</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih jenis kelamin" />
@@ -300,7 +404,7 @@ export default function StudentForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Agama</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih agama" />
@@ -433,7 +537,7 @@ export default function StudentForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Jenis Tinggal</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih jenis tinggal" />
@@ -453,7 +557,7 @@ export default function StudentForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Alat Transportasi</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih alat transportasi" />
@@ -541,7 +645,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Pendidikan Ayah</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih jenjang pendidikan" />
@@ -561,7 +665,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Pekerjaan Ayah</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih pekerjaan" />
@@ -581,7 +685,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Penghasilan Ayah</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih rentang penghasilan" />
@@ -644,7 +748,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Pendidikan Ibu</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih jenjang pendidikan" />
@@ -664,7 +768,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Pekerjaan Ibu</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih pekerjaan" />
@@ -684,7 +788,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Penghasilan Ibu</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih rentang penghasilan" />
@@ -747,7 +851,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Pendidikan Wali</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih jenjang pendidikan" />
@@ -767,7 +871,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Pekerjaan Wali</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih pekerjaan" />
@@ -787,7 +891,7 @@ export default function StudentForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Penghasilan Wali</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih rentang penghasilan" />
@@ -971,8 +1075,12 @@ export default function StudentForm() {
           </CardContent>
         </Card>
 
-
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-4">
+          {isEditMode && (
+              <Button type="button" variant="outline" size="lg" onClick={onCancel} disabled={isSubmitting}>
+                Batal
+              </Button>
+            )}
             <Button type="submit" size="lg" className="w-full md:w-auto" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
@@ -980,7 +1088,7 @@ export default function StudentForm() {
                   Menyimpan...
                 </>
               ) : (
-                "Simpan Data"
+                isEditMode ? "Simpan Perubahan" : "Simpan Data"
               )}
             </Button>
         </div>

@@ -6,9 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { id } from 'date-fns/locale';
 
@@ -69,6 +71,7 @@ interface StudentDetailModalProps {
   student: Student | null;
   isOpen: boolean;
   onClose: () => void;
+  onEdit: (student: Student) => void;
 }
 
 const DetailItem = ({ label, value }: { label: string; value?: string | number | null }) => (
@@ -78,7 +81,7 @@ const DetailItem = ({ label, value }: { label: string; value?: string | number |
   </div>
 );
 
-export default function StudentDetailModal({ student, isOpen, onClose }: StudentDetailModalProps) {
+export default function StudentDetailModal({ student, isOpen, onClose, onEdit }: StudentDetailModalProps) {
   if (!student) return null;
 
   const formatDate = (dateString?: string) => {
@@ -194,6 +197,11 @@ export default function StudentDetailModal({ student, isOpen, onClose }: Student
 
           </div>
         </ScrollArea>
+        <DialogFooter className="pt-4 sm:justify-start">
+            <Button variant="outline" onClick={() => onEdit(student)}>
+                Edit Data
+            </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

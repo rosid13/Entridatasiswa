@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import StudentDetailModal from './student-detail-modal';
 
-// Defines the complete student data structure
 interface Student {
   id: string;
   createdAt: string;
@@ -23,7 +21,7 @@ interface Student {
   gender: string;
   nisn?: string;
   birthPlace?: string;
-  birthDate?: string; // Stored as ISO string
+  birthDate?: string; 
   nik?: string;
   religion: string;
   address?: string;
@@ -68,17 +66,19 @@ interface Student {
   siblingsCount?: string;
 }
 
-export default function StudentList() {
+interface StudentListProps {
+  onStudentClick: (student: Student) => void;
+}
+
+export default function StudentList({ onStudentClick }: StudentListProps) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, "siswa"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const studentsData: Student[] = [];
       querySnapshot.forEach((doc) => {
-        // Push the full student document data
         studentsData.push({
           id: doc.id,
           ...doc.data(),
@@ -93,14 +93,6 @@ export default function StudentList() {
 
     return () => unsubscribe();
   }, []);
-
-  const handleRowClick = (student: Student) => {
-    setSelectedStudent(student);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedStudent(null);
-  };
 
   return (
     <>
@@ -128,7 +120,7 @@ export default function StudentList() {
                 </TableHeader>
                 <TableBody>
                   {students.map((student) => (
-                    <TableRow key={student.id} onClick={() => handleRowClick(student)} className="cursor-pointer">
+                    <TableRow key={student.id} onClick={() => onStudentClick(student)} className="cursor-pointer">
                       <TableCell className="font-medium">{student.fullName}</TableCell>
                       <TableCell>{student.nisn || '-'}</TableCell>
                       <TableCell>{student.gender}</TableCell>
@@ -143,12 +135,6 @@ export default function StudentList() {
           )}
         </CardContent>
       </Card>
-
-      <StudentDetailModal
-        student={selectedStudent}
-        isOpen={!!selectedStudent}
-        onClose={handleCloseModal}
-      />
     </>
   );
 }
