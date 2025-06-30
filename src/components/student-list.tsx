@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { collection, query, orderBy, getDocs, limit, startAfter, DocumentData, QueryDocumentSnapshot, where } from 'firebase/firestore';
+import { collection, query, getDocs, limit, startAfter, DocumentData, QueryDocumentSnapshot, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
@@ -47,7 +47,6 @@ export default function StudentList({ onStudentClick, activeYear }: StudentListP
       const q = query(
         collection(db, "siswa"),
         where("tahunAjaran", "==", activeYear),
-        orderBy("createdAt", "desc"),
         limit(STUDENTS_PER_PAGE)
       );
       const documentSnapshots = await getDocs(q);
@@ -65,13 +64,10 @@ export default function StudentList({ onStudentClick, activeYear }: StudentListP
       setHasMore(documentSnapshots.docs.length === STUDENTS_PER_PAGE);
     } catch (error: any) {
       console.error("Error fetching students: ", error);
-      const description = error.code === 'failed-precondition'
-        ? "Query membutuhkan indeks. Silakan buat indeks komposit di Firebase Console."
-        : "Tidak dapat mengambil daftar siswa. Periksa koneksi Anda.";
       toast({
         variant: "destructive",
         title: "Gagal Memuat Data",
-        description: description,
+        description: "Tidak dapat mengambil daftar siswa. Periksa koneksi Anda.",
       });
     } finally {
       setLoading(false);
@@ -90,7 +86,6 @@ export default function StudentList({ onStudentClick, activeYear }: StudentListP
         const q = query(
             collection(db, "siswa"),
             where("tahunAjaran", "==", activeYear),
-            orderBy("createdAt", "desc"),
             startAfter(lastVisible),
             limit(STUDENTS_PER_PAGE)
         );
