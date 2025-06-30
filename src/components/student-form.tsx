@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
+import { addDoc, collection } from "firebase/firestore";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { db } from "@/lib/firebase";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Nama lengkap wajib diisi." }),
@@ -79,6 +81,19 @@ const formSchema = z.object({
   guardianOccupation: z.string().optional(),
   guardianIncome: z.string().optional(),
   guardianNik: z.string().optional(),
+
+  // Data Tambahan Siswa
+  kipNumber: z.string().optional(),
+  kipName: z.string().optional(),
+  kksPkhNumber: z.string().optional(),
+  birthCertificateRegNo: z.string().optional(),
+  previousSchool: z.string().optional(),
+  childOrder: z.string().optional(),
+  kkNumber: z.string().optional(),
+  weight: z.string().optional(),
+  height: z.string().optional(),
+  headCircumference: z.string().optional(),
+  siblingsCount: z.string().optional(),
 });
 
 const religionOptions = ["Islam", "Kristen", "Katolik", "Hindu", "Buddha", "Konghucu", "Lainnya"];
@@ -117,20 +132,44 @@ export default function StudentForm() {
       guardianName: "",
       guardianBirthYear: "",
       guardianNik: "",
+      kipNumber: "",
+      kipName: "",
+      kksPkhNumber: "",
+      birthCertificateRegNo: "",
+      previousSchool: "",
+      childOrder: "",
+      kkNumber: "",
+      weight: "",
+      height: "",
+      headCircumference: "",
+      siblingsCount: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    console.log(values);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast({
-      title: "Sukses!",
-      description: "Data siswa berhasil disimpan.",
-    });
-    form.reset();
-    setIsSubmitting(false);
+    try {
+      const dataToSave = {
+        ...values,
+        birthDate: values.birthDate ? values.birthDate.toISOString() : null,
+        createdAt: new Date().toISOString(),
+      };
+      await addDoc(collection(db, "students"), dataToSave);
+      toast({
+        title: "Sukses!",
+        description: "Data siswa berhasil disimpan.",
+      });
+      form.reset();
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      toast({
+        variant: "destructive",
+        title: "Gagal!",
+        description: "Terjadi kesalahan saat menyimpan data.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -780,6 +819,158 @@ export default function StudentForm() {
             </Tabs>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Data Tambahan Siswa</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="kipNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nomor KIP</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nomor Kartu Indonesia Pintar" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="kipName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nama di KIP</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nama sesuai di KIP" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="kksPkhNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nomor KKS/PKH</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nomor KKS/PKH" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="birthCertificateRegNo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>No Registrasi Akta Lahir</FormLabel>
+                  <FormControl>
+                    <Input placeholder="No registrasi akta lahir" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="previousSchool"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sekolah Asal</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nama sekolah sebelumnya" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="kkNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>No KK</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nomor Kartu Keluarga" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="childOrder"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Anak ke-berapa</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="Contoh: 1" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="siblingsCount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Jumlah Saudara Kandung</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="Contoh: 2" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Berat Badan (kg)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="Contoh: 45" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="height"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tinggi Badan (cm)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="Contoh: 160" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="headCircumference"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Lingkar Kepala (cm)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="Contoh: 55" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
 
         <div className="flex justify-end">
             <Button type="submit" size="lg" className="w-full md:w-auto" disabled={isSubmitting}>

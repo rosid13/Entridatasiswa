@@ -1,4 +1,5 @@
 import StudentForm from '@/components/student-form';
+import StudentList from '@/components/student-list';
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
           <p className="text-muted-foreground mt-2">Silakan isi data siswa dengan lengkap dan benar.</p>
         </header>
         <StudentForm />
+        <StudentList />
       </div>
     </main>
   );
