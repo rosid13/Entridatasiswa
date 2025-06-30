@@ -14,15 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { Student } from '@/types/student';
-
 
 interface StudentListProps {
   onStudentClick: (student: Student) => void;
@@ -32,8 +24,6 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedClass, setSelectedClass] = useState('__all__');
-  const [uniqueClasses, setUniqueClasses] = useState<string[]>([]);
 
   useEffect(() => {
     const q = query(collection(db, "siswa"), orderBy("createdAt", "desc"));
@@ -46,8 +36,6 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
         } as Student);
       });
       setStudents(studentsData);
-      const classes = [...new Set(studentsData.map(s => s.kelas).filter(Boolean) as string[])];
-      setUniqueClasses(classes.sort());
       setLoading(false);
     }, (error) => {
       console.error("Error fetching students: ", error);
@@ -63,9 +51,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       student.fullName.toLowerCase().includes(searchLower) ||
       (student.nisn && student.nisn.toLowerCase().includes(searchLower));
 
-    const matchesClass = selectedClass === '__all__' ? true : student.kelas === selectedClass;
-
-    return matchesSearch && matchesClass;
+    return matchesSearch;
   });
 
   return (
@@ -79,19 +65,8 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
             placeholder="Cari Nama atau NISN..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-grow"
+            className="w-full"
           />
-          <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="sm:w-[200px]">
-              <SelectValue placeholder="Filter Kelas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">Semua Kelas</SelectItem>
-              {uniqueClasses.map(cls => (
-                <SelectItem key={cls} value={cls}>{cls}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
         {loading ? (
            <div className="space-y-2">
