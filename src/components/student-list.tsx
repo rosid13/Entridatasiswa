@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { collection, query, orderBy, getDocs, limit, startAfter, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, limit, startAfter, DocumentData, QueryDocumentSnapshot, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
@@ -26,11 +26,12 @@ import { Badge } from './ui/badge';
 
 interface StudentListProps {
   onStudentClick: (student: Student) => void;
+  activeYear: string;
 }
 
 const STUDENTS_PER_PAGE = 20;
 
-export default function StudentList({ onStudentClick }: StudentListProps) {
+export default function StudentList({ onStudentClick, activeYear }: StudentListProps) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -45,6 +46,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     try {
       const q = query(
         collection(db, "siswa"),
+        where("tahunAjaran", "==", activeYear),
         orderBy("createdAt", "desc"),
         limit(STUDENTS_PER_PAGE)
       );
@@ -61,17 +63,20 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       const lastVisibleDoc = documentSnapshots.docs[documentSnapshots.docs.length - 1];
       setLastVisible(lastVisibleDoc);
       setHasMore(documentSnapshots.docs.length === STUDENTS_PER_PAGE);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching students: ", error);
+      const description = error.code === 'failed-precondition'
+        ? "Query membutuhkan indeks. Silakan buat indeks komposit di Firebase Console."
+        : "Tidak dapat mengambil daftar siswa. Periksa koneksi Anda.";
       toast({
         variant: "destructive",
         title: "Gagal Memuat Data",
-        description: "Tidak dapat mengambil daftar siswa. Periksa koneksi Anda dan muat ulang halaman.",
+        description: description,
       });
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, activeYear]);
 
   useEffect(() => {
     fetchStudents();
@@ -84,6 +89,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     try {
         const q = query(
             collection(db, "siswa"),
+            where("tahunAjaran", "==", activeYear),
             orderBy("createdAt", "desc"),
             startAfter(lastVisible),
             limit(STUDENTS_PER_PAGE)
@@ -142,7 +148,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       const cellCenterStyle = { border: thinBorder, alignment: { horizontal: 'center', vertical: 'center' } };
 
       const headers = [
-        "Nama Lengkap", "Jenis Kelamin", "NISN", "Kelas", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama",
+        "Tahun Ajaran", "Nama Lengkap", "Jenis Kelamin", "NISN", "Kelas", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama",
         "Alamat", "RT", "RW", "Dusun", "Kelurahan", "Kecamatan", "Kode Pos",
         "Jenis Tinggal", "Alat Transportasi", "Telepon", "No. HP",
         "Nama Ayah", "Tahun Lahir Ayah", "Pendidikan Ayah", "Pekerjaan Ayah", "Penghasilan Ayah", "NIK Ayah",
@@ -153,7 +159,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       ];
 
       const dataToExport = filteredStudents.map(s => ([
-        s.fullName, s.gender, s.nisn ?? '', s.kelas ?? '', s.birthPlace ?? '', s.birthDate ? format(new Date(s.birthDate), 'dd-MM-yyyy') : '', s.nik ?? '', s.religion,
+        s.tahunAjaran, s.fullName, s.gender, s.nisn ?? '', s.kelas ?? '', s.birthPlace ?? '', s.birthDate ? format(new Date(s.birthDate), 'dd-MM-yyyy') : '', s.nik ?? '', s.religion,
         s.address ?? '', s.rt ?? '', s.rw ?? '', s.dusun ?? '', s.kelurahan ?? '', s.kecamatan ?? '', s.postalCode ?? '',
         s.residenceType, s.transportMode, s.phone ?? '', s.mobilePhone,
         s.fatherName, s.fatherBirthYear ?? '', s.fatherEducation ?? '', s.fatherOccupation ?? '', s.fatherIncome ?? '', s.fatherNik ?? '',
@@ -164,7 +170,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       ]));
       
       const finalData = [
-        ["Laporan Data Siswa - Student Data Entry"],
+        [`Laporan Data Siswa - Tahun Ajaran ${activeYear}`],
         [`Tanggal Ekspor: ${format(new Date(), "dd MMMM yyyy HH:mm", { locale: id })}`],
         [],
         headers,
@@ -179,8 +185,8 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       const headerRowIndex = 3; 
       const dataStartIndex = headerRowIndex + 1;
       const dataEndIndex = dataStartIndex + dataToExport.length - 1;
-      const textFormatColumnIndices = [2, 6, 9, 10, 14, 17, 18, 20, 24, 26, 30, 32, 36, 37, 38, 39, 41, 42, 44, 45, 46, 47];
-      const centeredColumnIndices = [1, 2, 5, 6, 9, 10, 14, 20, 24, 26, 30, 32, 36, 37, 38, 39, 45, 46, 47, 48];
+      const textFormatColumnIndices = [3, 7, 10, 11, 15, 18, 19, 21, 25, 27, 31, 33, 37, 38, 39, 40, 42, 43, 44, 46, 47, 48, 49];
+      const centeredColumnIndices = [2, 3, 6, 7, 10, 11, 15, 21, 25, 27, 31, 33, 37, 38, 39, 40, 47, 48, 49, 50];
 
       for (let R = headerRowIndex; R <= dataEndIndex; ++R) {
           for (let C = 0; C < headers.length; ++C) {
@@ -215,7 +221,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
 
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "DataSiswa");
-      XLSX.writeFile(workbook, "Data_Siswa_Lengkap.xlsx", { bookType: 'xlsx', type: 'buffer' });
+      XLSX.writeFile(workbook, `Data_Siswa_${activeYear.replace('/','-')}.xlsx`, { bookType: 'xlsx', type: 'buffer' });
       
       toast({
           title: "Ekspor Berhasil",
@@ -235,7 +241,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     <Card className="mt-12">
       <CardHeader>
         <CardTitle>Data Siswa Terdaftar</CardTitle>
-        <CardDescription>Cari dan kelola data siswa yang sudah terdaftar dalam sistem.</CardDescription>
+        <CardDescription>Cari dan kelola data siswa untuk tahun ajaran {activeYear}.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -300,7 +306,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
           </>
         ) : (
           <p className="text-center text-muted-foreground py-8">
-            {searchQuery ? 'Tidak ada siswa yang cocok dengan kriteria pencarian.' : 'Belum ada data siswa yang terdaftar.'}
+            {searchQuery ? 'Tidak ada siswa yang cocok dengan kriteria pencarian.' : `Belum ada data siswa untuk tahun ajaran ${activeYear}.`}
           </p>
         )}
       </CardContent>

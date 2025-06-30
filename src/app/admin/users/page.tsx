@@ -13,6 +13,7 @@ import { collection, query, getDocs, doc, setDoc, getDoc, updateDoc, orderBy } f
 import { db, auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { AppSession } from '@/app/page';
+import { useAcademicYear } from '@/context/academic-year-context';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ export default function UserManagementPage() {
     
     const router = useRouter();
     const { toast } = useToast();
+    const { activeYear, isLoading: isYearLoading } = useAcademicYear();
 
     const form = useForm<z.infer<typeof registerFormSchema>>({
         resolver: zodResolver(registerFormSchema),
@@ -54,7 +56,6 @@ export default function UserManagementPage() {
         },
     });
 
-    // Check for admin role
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
@@ -81,7 +82,12 @@ export default function UserManagementPage() {
         return () => unsubscribe();
     }, [router, toast]);
 
-    // Fetch users
+    useEffect(() => {
+        if (!isYearLoading && !activeYear) {
+          router.push('/select-year');
+        }
+    }, [activeYear, isYearLoading, router]);
+
     const fetchUsers = useCallback(async () => {
         if (session?.role !== 'admin') return;
         setUsersLoading(true);
@@ -109,14 +115,11 @@ export default function UserManagementPage() {
         fetchUsers();
     }, [fetchUsers]);
 
-    // Handle user registration
     async function onRegisterSubmit(values: z.infer<typeof registerFormSchema>) {
         setIsRegistering(true);
         try {
-            // We need a temporary auth client to create user without logging out the admin
             const { user } = await createUserWithEmailAndPassword(auth, values.email, values.password);
             
-            // Now, add user role to Firestore
             await setDoc(doc(db, "userRoles", user.uid), {
                 email: values.email,
                 role: "user",
@@ -127,7 +130,7 @@ export default function UserManagementPage() {
                 description: `Pengguna baru dengan email ${values.email} telah dibuat.`,
             });
             form.reset();
-            fetchUsers(); // Refresh the user list
+            fetchUsers(); 
         } catch (error: any) {
             console.error("Error registering user: ", error);
             const message = error.code === 'auth/email-already-in-use' 
@@ -143,7 +146,6 @@ export default function UserManagementPage() {
         }
     }
 
-    // Handle role change
     const handleRoleChange = async (userId: string, newRole: 'user' | 'admin') => {
         try {
             const userRoleRef = doc(db, "userRoles", userId);
@@ -152,7 +154,7 @@ export default function UserManagementPage() {
                 title: "Peran Diperbarui",
                 description: `Peran pengguna telah berhasil diubah menjadi ${newRole}.`
             });
-            fetchUsers(); // Refresh the user list
+            fetchUsers(); 
         } catch (error) {
             console.error("Error updating role:", error);
             toast({
@@ -163,7 +165,7 @@ export default function UserManagementPage() {
         }
     };
 
-    if (pageLoading) {
+    if (pageLoading || isYearLoading || !activeYear) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-background">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />

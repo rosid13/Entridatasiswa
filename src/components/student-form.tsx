@@ -38,6 +38,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
 import type { Student } from "@/types/student";
+import { useAcademicYear } from "@/context/academic-year-context";
 
 interface StudentFormProps {
   studentToEdit: Student | null;
@@ -161,6 +162,7 @@ const defaultFormValues = {
 
 export default function StudentForm({ studentToEdit, onSuccess, onCancel }: StudentFormProps) {
   const { toast } = useToast();
+  const { activeYear } = useAcademicYear();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const isEditMode = !!studentToEdit;
 
@@ -171,19 +173,14 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
 
   React.useEffect(() => {
     if (isEditMode && studentToEdit) {
-      // Create a mutable copy of the student data
       const studentDataForForm: { [key: string]: any } = { ...studentToEdit };
 
-      // Sanitize null values to empty strings for form compatibility.
-      // Firestore may return null for empty fields, but our form validation
-      // expects strings.
       Object.keys(studentDataForForm).forEach(key => {
         if (studentDataForForm[key] === null) {
           studentDataForForm[key] = '';
         }
       });
       
-      // Also convert the birthDate string from ISO format to a Date object
       const finalDataForForm = {
         ...studentDataForForm,
         birthDate: studentToEdit.birthDate ? new Date(studentToEdit.birthDate) : undefined,
@@ -198,15 +195,27 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    
+    const tahunAjaranUntukSimpan = isEditMode ? studentToEdit.tahunAjaran : activeYear;
+
+    if (!tahunAjaranUntukSimpan) {
+        toast({
+            variant: "destructive",
+            title: "Tahun Ajaran Tidak Valid",
+            description: "Silakan pilih kembali tahun ajaran dan coba lagi.",
+        });
+        setIsSubmitting(false);
+        return;
+    }
+
     try {
-      // Sanitize form values for Firestore. Convert empty strings and undefined to null.
       const dataToSave: { [key: string]: any } = {};
       Object.entries(values).forEach(([key, value]) => {
         dataToSave[key] = value === undefined || value === "" ? null : value;
       });
       
-      // Specifically handle the date conversion
       dataToSave.birthDate = values.birthDate ? values.birthDate.toISOString() : null;
+      dataToSave.tahunAjaran = tahunAjaranUntukSimpan;
 
       if (isEditMode && studentToEdit) {
         const studentRef = doc(db, "siswa", studentToEdit.id);
@@ -216,13 +225,13 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
           description: "Data siswa telah berhasil diperbarui.",
         });
         const updatedStudent: Student = {
-          ...studentToEdit,
+          id: studentToEdit.id,
+          createdAt: studentToEdit.createdAt,
           ...dataToSave,
-          birthDate: dataToSave.birthDate,
-        };
+        } as Student;
         onSuccess(updatedStudent);
       } else {
-        await addDoc(collection(db, "siswa"), {
+        const docRef = await addDoc(collection(db, "siswa"), {
           ...dataToSave,
           createdAt: new Date().toISOString(),
         });
@@ -251,7 +260,9 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         <Card>
           <CardHeader>
             <CardTitle>{isEditMode ? "Edit Data Siswa" : "Formulir Pendaftaran Siswa Baru"}</CardTitle>
-            <CardDescription>Pastikan semua data diisi dengan benar dan sesuai dengan dokumen yang valid.</CardDescription>
+            <CardDescription>
+                {`Semua data akan disimpan untuk Tahun Ajaran ${isEditMode ? studentToEdit.tahunAjaran : activeYear}. Pastikan semua data diisi dengan benar.`}
+            </CardDescription>
           </CardHeader>
         </Card>
         <Card>

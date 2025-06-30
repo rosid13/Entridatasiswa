@@ -6,8 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,17 +27,11 @@ export default function LoginPage() {
   const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
 
   React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const userRoleRef = doc(db, "userRoles", user.uid);
-        const docSnap = await getDoc(userRoleRef);
-        const userRole = (docSnap.exists() && docSnap.data().role) ? docSnap.data().role : 'user';
-        
-        if (userRole === 'admin') {
-            router.push('/admin/dashboard');
-        } else {
-            router.push('/');
-        }
+        // User is logged in, redirect to year selection page.
+        // That page will handle role-based redirection.
+        router.push('/select-year');
       } else {
         setIsCheckingAuth(false);
       }
@@ -61,15 +54,18 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Login Berhasil!",
-        description: "Selamat datang, Anda akan diarahkan.",
+        description: "Anda akan diarahkan untuk memilih tahun ajaran.",
       });
       // The onAuthStateChanged listener will handle redirection.
     } catch (error: any) {
       console.error("Login failed: ", error);
+      const message = error.code === 'auth/invalid-credential' 
+          ? "Email atau password salah. Silakan coba lagi."
+          : "Terjadi kesalahan saat login. Silakan coba lagi.";
       toast({
         variant: "destructive",
         title: "Login Gagal!",
-        description: "Email atau password salah. Silakan coba lagi.",
+        description: message,
       });
     } finally {
       setIsSubmitting(false);

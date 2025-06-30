@@ -1,6 +1,7 @@
 export interface Student {
     id: string;
     createdAt: string;
+    tahunAjaran: string;
     fullName: string;
     gender: string;
     nisn?: string | null;

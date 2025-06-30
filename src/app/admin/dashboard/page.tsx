@@ -3,18 +3,19 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { collection, query, where, onSnapshot, getCountFromServer, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, getCountFromServer, doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { db, auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { useAcademicYear } from '@/context/academic-year-context';
 
 import type { AppSession } from '@/app/page';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Users, FileCheck2, LogOut, UserPlus, List } from 'lucide-react';
+import { Loader2, Users, FileCheck2, LogOut, UserPlus, List, Calendar } from 'lucide-react';
 import Footer from '@/components/footer';
 
 export default function AdminDashboardPage() {
@@ -25,6 +26,7 @@ export default function AdminDashboardPage() {
 
     const router = useRouter();
     const { toast } = useToast();
+    const { activeYear, isLoading: isYearLoading } = useAcademicYear();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -50,9 +52,15 @@ export default function AdminDashboardPage() {
         });
         return () => unsubscribe();
     }, [router, toast]);
+
+    useEffect(() => {
+        if (!isYearLoading && !activeYear) {
+          router.push('/select-year');
+        }
+    }, [activeYear, isYearLoading, router]);
     
     useEffect(() => {
-        if (!session) return;
+        if (!session || !activeYear) return;
 
         let studentsUnsub = () => {};
         let requestsUnsub = () => {};
@@ -60,11 +68,11 @@ export default function AdminDashboardPage() {
         const fetchStats = async () => {
             try {
                 setStatsLoading(true);
-                // Get student count
-                const studentColl = collection(db, "siswa");
-                const studentSnapshot = await getCountFromServer(studentColl);
+                // Get student count for the active academic year
+                const studentCollQuery = query(collection(db, "siswa"), where("tahunAjaran", "==", activeYear));
+                const studentSnapshot = await getCountFromServer(studentCollQuery);
                 
-                // Get pending requests count
+                // Get pending requests count (not year-specific)
                 const requestsQuery = query(collection(db, "correctionRequests"), where("status", "==", "pending"));
                 const requestsSnapshot = await getCountFromServer(requestsQuery);
 
@@ -86,8 +94,9 @@ export default function AdminDashboardPage() {
 
         fetchStats();
 
-        // Also set up listeners for real-time updates
-        studentsUnsub = onSnapshot(collection(db, "siswa"), (snap) => {
+        // Listeners for real-time updates
+        const studentQuery = query(collection(db, "siswa"), where("tahunAjaran", "==", activeYear));
+        studentsUnsub = onSnapshot(studentQuery, (snap) => {
              setStats(prev => ({...prev, studentCount: snap.size}));
         }, (error) => {
             console.error("Real-time student count failed:", error);
@@ -103,7 +112,7 @@ export default function AdminDashboardPage() {
             requestsUnsub();
         };
 
-    }, [session, toast]);
+    }, [session, toast, activeYear]);
     
     const handleLogout = async () => {
         try {
@@ -116,7 +125,7 @@ export default function AdminDashboardPage() {
         }
     };
 
-    if (pageLoading) {
+    if (pageLoading || isYearLoading || !activeYear) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-background">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -130,10 +139,16 @@ export default function AdminDashboardPage() {
                  <header className="bg-card border-b">
                     <div className="max-w-7xl mx-auto flex justify-between items-center p-4 sm:p-6">
                         <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-                        <Button variant="outline" onClick={handleLogout}>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Logout
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" onClick={() => router.push('/select-year')}>
+                                <Calendar className="mr-2 h-4 w-4" />
+                                Ubah Tahun Ajaran
+                            </Button>
+                            <Button variant="outline" onClick={handleLogout}>
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Logout
+                            </Button>
+                        </div>
                     </div>
                 </header>
 
@@ -142,7 +157,7 @@ export default function AdminDashboardPage() {
                     <div className="grid gap-6 md:grid-cols-2">
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Siswa</CardTitle>
+                                <CardTitle className="text-sm font-medium">Total Siswa ({activeYear})</CardTitle>
                                 <Users className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -151,7 +166,7 @@ export default function AdminDashboardPage() {
                                 ) : (
                                     <div className="text-4xl font-bold">{stats.studentCount}</div>
                                 )}
-                                <p className="text-xs text-muted-foreground mt-1">Jumlah siswa yang terdaftar di sistem</p>
+                                <p className="text-xs text-muted-foreground mt-1">Jumlah siswa di tahun ajaran ini</p>
                             </CardContent>
                         </Card>
                         <Card>

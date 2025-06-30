@@ -13,8 +13,9 @@ import { db, auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { Student } from '@/types/student';
 import { Button } from '@/components/ui/button';
-import { Loader2, LogOut, LayoutDashboard } from 'lucide-react';
+import { Loader2, LogOut, LayoutDashboard, Calendar } from 'lucide-react';
 import Footer from '@/components/footer';
+import { useAcademicYear } from '@/context/academic-year-context';
 
 export interface AppSession {
   user: User;
@@ -24,12 +25,13 @@ export interface AppSession {
 export default function Home() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [listKey, setListKey] = useState(0); // Key to force re-render of the list
+  const [listKey, setListKey] = useState(0); 
   const formRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const router = useRouter();
   const [session, setSession] = useState<AppSession | null>(null);
   const [loading, setLoading] = useState(true);
+  const { activeYear, isLoading: isYearLoading } = useAcademicYear();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -37,11 +39,10 @@ export default function Home() {
         const userRoleRef = doc(db, "userRoles", currentUser.uid);
         const docSnap = await getDoc(userRoleRef);
 
-        let userRole = 'user'; // Peran default
+        let userRole = 'user';
         if (docSnap.exists() && docSnap.data().role) {
           userRole = docSnap.data().role;
         } else if (!docSnap.exists()) {
-          // Buat dokumen peran untuk pengguna baru
           try {
             await setDoc(userRoleRef, { role: 'user', email: currentUser.email });
           } catch (error) {
@@ -52,11 +53,6 @@ export default function Home() {
               description: "Tidak dapat mengatur peran pengguna. Coba muat ulang halaman.",
             });
           }
-        }
-        
-        // Admins should start at the dashboard, users at the student list
-        if (userRole === 'admin' && window.location.pathname !== '/admin/dashboard' && window.location.pathname === '/login') {
-            router.push('/admin/dashboard');
         }
         
         setSession({ user: currentUser, role: userRole });
@@ -70,6 +66,12 @@ export default function Home() {
 
     return () => unsubscribe();
   }, [router, toast]);
+
+  useEffect(() => {
+    if (!isYearLoading && !activeYear) {
+      router.push('/select-year');
+    }
+  }, [activeYear, isYearLoading, router]);
 
   const handleStudentClick = (student: Student) => {
     setSelectedStudent(student);
@@ -91,7 +93,7 @@ export default function Home() {
       setSelectedStudent(updatedStudent);
     }
     setEditingStudent(null);
-    setListKey(prev => prev + 1); // Force a refresh of the student list
+    setListKey(prev => prev + 1); 
   };
 
   const handleCancelEdit = () => {
@@ -108,7 +110,7 @@ export default function Home() {
         description: "Data siswa berhasil dihapus.",
       });
       setSelectedStudent(null);
-      setListKey(prev => prev + 1); // Force a refresh of the student list
+      setListKey(prev => prev + 1); 
     } catch (error) {
        console.error("Error deleting document: ", error);
        toast({
@@ -137,7 +139,7 @@ export default function Home() {
     }
   };
 
-  if (loading) {
+  if (loading || isYearLoading || !activeYear) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -146,7 +148,7 @@ export default function Home() {
   }
 
   if (!session) {
-    return null; // or a redirect component, but useEffect handles it
+    return null; 
   }
 
   return (
@@ -159,6 +161,10 @@ export default function Home() {
                   <p className="text-muted-foreground mt-3 max-w-2xl">Platform terpusat untuk mengelola informasi siswa secara efisien, modern, dan aman.</p>
               </div>
               <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={() => router.push('/select-year')}>
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Ubah Tahun Ajaran
+                  </Button>
                   {session.role === 'admin' && (
                     <Link href="/admin/dashboard" passHref>
                         <Button variant="outline">
@@ -180,7 +186,7 @@ export default function Home() {
               onCancel={handleCancelEdit}
             />
           </div>
-          <StudentList onStudentClick={handleStudentClick} key={listKey} />
+          <StudentList onStudentClick={handleStudentClick} key={listKey} activeYear={activeYear} />
         </div>
          <StudentDetailModal
           student={selectedStudent}

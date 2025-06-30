@@ -88,6 +88,7 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 border-t">
                   <DetailItem label="Nama Lengkap" value={student.fullName} />
                   <DetailItem label="Jenis Kelamin" value={student.gender} />
+                  <DetailItem label="Tahun Ajaran" value={student.tahunAjaran} />
                   <DetailItem label="NISN" value={student.nisn} />
                   <DetailItem label="NIK" value={student.nik} />
                   <DetailItem label="Tempat Lahir" value={student.birthPlace} />

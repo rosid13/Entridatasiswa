@@ -13,6 +13,7 @@ import { id } from 'date-fns/locale';
 
 import type { CorrectionRequest } from '@/types/correction-request';
 import type { AppSession } from '@/app/page';
+import { useAcademicYear } from '@/context/academic-year-context';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ export default function RequestsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const { toast } = useToast();
+    const { activeYear, isLoading: isYearLoading } = useAcademicYear();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -58,6 +60,12 @@ export default function RequestsPage() {
 
         return () => unsubscribe();
     }, [router, toast]);
+
+     useEffect(() => {
+        if (!isYearLoading && !activeYear) {
+          router.push('/select-year');
+        }
+    }, [activeYear, isYearLoading, router]);
 
     useEffect(() => {
         if (session?.role !== 'admin') return;
@@ -133,7 +141,7 @@ export default function RequestsPage() {
       }
     };
 
-    if (pageLoading) {
+    if (pageLoading || isYearLoading || !activeYear) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-background">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
