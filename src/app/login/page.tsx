@@ -51,7 +51,7 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Login Berhasil!",
-        description: "Selamat datang kembali.",
+        description: "Selamat datang, Anda berhasil masuk.",
       });
       router.push("/");
     } catch (error: any) {

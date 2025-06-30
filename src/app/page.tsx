@@ -88,7 +88,7 @@ export default function Home() {
       const studentRef = doc(db, "siswa", studentId);
       await deleteDoc(studentRef);
       toast({
-        title: "Sukses!",
+        title: "Data Dihapus!",
         description: "Data siswa berhasil dihapus.",
       });
       setSelectedStudent(null);

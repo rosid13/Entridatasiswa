@@ -155,8 +155,8 @@ export default function CorrectionRequestModal({
       });
 
       toast({
-        title: "Sukses!",
-        description: "Pengajuan perbaikan data telah berhasil dikirim.",
+        title: "Pengajuan Terkirim!",
+        description: "Permintaan perbaikan Anda telah dikirim untuk ditinjau.",
       });
       form.reset();
       onClose();

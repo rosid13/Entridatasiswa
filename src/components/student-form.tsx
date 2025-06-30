@@ -200,8 +200,8 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         const studentRef = doc(db, "siswa", studentToEdit.id);
         await updateDoc(studentRef, dataToSave);
         toast({
-          title: "Sukses!",
-          description: "Data siswa berhasil diperbarui.",
+          title: "Perubahan Disimpan!",
+          description: "Data siswa telah berhasil diperbarui.",
         });
         const updatedStudent: Student = {
             ...studentToEdit,
@@ -215,8 +215,8 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
           createdAt: new Date().toISOString(),
         });
         toast({
-          title: "Sukses!",
-          description: "Data siswa berhasil disimpan.",
+          title: "Siswa Ditambahkan!",
+          description: "Data siswa baru telah berhasil disimpan.",
         });
         form.reset(defaultFormValues);
         onSuccess();

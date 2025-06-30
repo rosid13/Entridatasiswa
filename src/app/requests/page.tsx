@@ -106,8 +106,8 @@ export default function RequestsPage() {
             await batch.commit();
 
             toast({
-                title: "Sukses!",
-                description: `Permintaan telah berhasil ${action === 'approve' ? 'disetujui' : 'ditolak'}.`,
+                title: `Permintaan ${action === 'approve' ? 'Disetujui' : 'Ditolak'}`,
+                description: `Permintaan perbaikan telah berhasil ${action === 'approve' ? 'disetujui dan data siswa diperbarui' : 'ditolak'}.`,
             });
             setSelectedRequest(null);
         } catch (error) {
