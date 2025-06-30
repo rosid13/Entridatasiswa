@@ -23,6 +23,7 @@ export interface AppSession {
 export default function Home() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [listKey, setListKey] = useState(0); // Key to force re-render of the list
   const formRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const router = useRouter();
@@ -89,6 +90,7 @@ export default function Home() {
       setSelectedStudent(updatedStudent);
     }
     setEditingStudent(null);
+    setListKey(prev => prev + 1); // Force a refresh of the student list
   };
 
   const handleCancelEdit = () => {
@@ -105,6 +107,7 @@ export default function Home() {
         description: "Data siswa berhasil dihapus.",
       });
       setSelectedStudent(null);
+      setListKey(prev => prev + 1); // Force a refresh of the student list
     } catch (error) {
        console.error("Error deleting document: ", error);
        toast({
@@ -175,7 +178,7 @@ export default function Home() {
             onCancel={handleCancelEdit}
           />
         </div>
-        <StudentList onStudentClick={handleStudentClick} />
+        <StudentList onStudentClick={handleStudentClick} key={listKey} />
       </div>
        <StudentDetailModal
         student={selectedStudent}
