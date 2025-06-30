@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
@@ -54,11 +55,38 @@ const formSchema = z.object({
   transportMode: z.string({ required_error: "Alat transportasi wajib dipilih." }),
   phone: z.string().optional(),
   mobilePhone: z.string().min(1, { message: "Nomor HP wajib diisi." }),
+
+  // Data Ayah
+  fatherName: z.string().min(1, { message: "Nama Ayah wajib diisi." }),
+  fatherBirthYear: z.string().optional(),
+  fatherEducation: z.string().optional(),
+  fatherOccupation: z.string().optional(),
+  fatherIncome: z.string().optional(),
+  fatherNik: z.string().optional(),
+
+  // Data Ibu
+  motherName: z.string().min(1, { message: "Nama Ibu wajib diisi." }),
+  motherBirthYear: z.string().optional(),
+  motherEducation: z.string().optional(),
+  motherOccupation: z.string().optional(),
+  motherIncome: z.string().optional(),
+  motherNik: z.string().optional(),
+
+  // Data Wali
+  guardianName: z.string().optional(),
+  guardianBirthYear: z.string().optional(),
+  guardianEducation: z.string().optional(),
+  guardianOccupation: z.string().optional(),
+  guardianIncome: z.string().optional(),
+  guardianNik: z.string().optional(),
 });
 
 const religionOptions = ["Islam", "Kristen", "Katolik", "Hindu", "Buddha", "Konghucu", "Lainnya"];
 const residenceOptions = ["Bersama Orang Tua", "Wali", "Kos", "Asrama", "Panti Asuhan", "Lainnya"];
 const transportOptions = ["Jalan Kaki", "Sepeda", "Sepeda Motor", "Mobil Pribadi", "Angkutan Umum", "Lainnya"];
+const educationOptions = ["Tidak Sekolah", "SD", "SMP", "SMA", "D1", "D2", "D3", "D4", "S1", "S2", "S3"];
+const occupationOptions = ["Tidak Bekerja", "Petani", "Buruh", "PNS", "Wiraswasta", "Lainnya"];
+const incomeOptions = ["< 500rb", "500rb-1jt", "1jt-2jt", "2jt-5jt", "> 5jt", "Tidak Berpenghasilan"];
 
 export default function StudentForm() {
   const { toast } = useToast();
@@ -80,6 +108,15 @@ export default function StudentForm() {
       postalCode: "",
       phone: "",
       mobilePhone: "",
+      fatherName: "",
+      fatherBirthYear: "",
+      fatherNik: "",
+      motherName: "",
+      motherBirthYear: "",
+      motherNik: "",
+      guardianName: "",
+      guardianBirthYear: "",
+      guardianNik: "",
     },
   });
 
@@ -417,6 +454,330 @@ export default function StudentForm() {
                 </FormItem>
               )}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Data Keluarga</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="father" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="father">Data Ayah</TabsTrigger>
+                <TabsTrigger value="mother">Data Ibu</TabsTrigger>
+                <TabsTrigger value="guardian">Data Wali</TabsTrigger>
+              </TabsList>
+              <TabsContent value="father" className="mt-6 space-y-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="fatherName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nama Ayah</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nama lengkap ayah" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fatherBirthYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tahun Lahir Ayah</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="Contoh: 1970" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fatherEducation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pendidikan Ayah</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih jenjang pendidikan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {educationOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fatherOccupation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pekerjaan Ayah</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih pekerjaan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {occupationOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fatherIncome"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Penghasilan Ayah</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih rentang penghasilan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {incomeOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fatherNik"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>NIK Ayah</FormLabel>
+                          <FormControl>
+                            <Input placeholder="NIK ayah" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                 </div>
+              </TabsContent>
+              <TabsContent value="mother" className="mt-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="motherName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nama Ibu</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nama lengkap ibu" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="motherBirthYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tahun Lahir Ibu</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="Contoh: 1972" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="motherEducation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pendidikan Ibu</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih jenjang pendidikan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {educationOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="motherOccupation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pekerjaan Ibu</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih pekerjaan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {occupationOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="motherIncome"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Penghasilan Ibu</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih rentang penghasilan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {incomeOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="motherNik"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>NIK Ibu</FormLabel>
+                          <FormControl>
+                            <Input placeholder="NIK ibu" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                 </div>
+              </TabsContent>
+              <TabsContent value="guardian" className="mt-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="guardianName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nama Wali</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nama lengkap wali" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="guardianBirthYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tahun Lahir Wali</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="Contoh: 1965" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="guardianEducation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pendidikan Wali</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih jenjang pendidikan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {educationOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="guardianOccupation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pekerjaan Wali</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih pekerjaan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {occupationOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="guardianIncome"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Penghasilan Wali</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih rentang penghasilan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {incomeOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="guardianNik"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>NIK Wali</FormLabel>
+                          <FormControl>
+                            <Input placeholder="NIK wali" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                 </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
