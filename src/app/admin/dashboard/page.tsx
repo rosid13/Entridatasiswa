@@ -118,16 +118,16 @@ export default function AdminDashboardPage() {
 
     if (pageLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-secondary">
+            <div className="flex min-h-screen items-center justify-center bg-background">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-secondary">
+        <div className="flex flex-col min-h-screen bg-background">
             <main className="flex-grow">
-                 <header className="bg-background border-b">
+                 <header className="bg-card border-b">
                     <div className="max-w-7xl mx-auto flex justify-between items-center p-4 sm:p-6">
                         <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
                         <Button variant="outline" onClick={handleLogout}>

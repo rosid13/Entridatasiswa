@@ -139,7 +139,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-secondary">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
@@ -150,7 +150,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-secondary">
+    <div className="flex flex-col min-h-screen bg-background">
       <main className="flex-grow p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
           <header className="flex justify-between items-center mb-10">

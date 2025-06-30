@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, GraduationCap } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid." }),
@@ -78,70 +78,73 @@ export default function LoginPage() {
   
   if (isCheckingAuth) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-secondary">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-secondary p-4">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
-          SMP SUNAN AL-ANBIYA TAMAN
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Sistem Manajemen Data Siswa
-        </p>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="w-full max-w-sm space-y-8">
+        <div className="text-center">
+            <GraduationCap className="mx-auto h-12 w-12 text-primary mb-4" />
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+            SMP SUNAN AL-ANBIYA
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+            Sistem Manajemen Data Siswa
+            </p>
+        </div>
+        <Card>
+            <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Selamat Datang</CardTitle>
+            <CardDescription>Masuk untuk mengelola data siswa</CardDescription>
+            </CardHeader>
+            <CardContent>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                        <Input type="email" placeholder="contoh@email.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                    <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Memproses...
+                    </>
+                    ) : (
+                    "Login"
+                    )}
+                </Button>
+                </form>
+            </Form>
+            </CardContent>
+        </Card>
       </div>
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Masuk untuk mengelola data siswa</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="contoh@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Memproses...
-                  </>
-                ) : (
-                  "Login"
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
     </main>
   );
 }
