@@ -14,7 +14,7 @@ import type { Student } from '@/types/student';
 import { Button } from '@/components/ui/button';
 import { Loader2, LogOut } from 'lucide-react';
 
-interface AppSession {
+export interface AppSession {
   user: User;
   role: string;
 }
@@ -161,7 +161,7 @@ export default function Home() {
         onClose={handleCloseModal}
         onEdit={handleStartEdit}
         onDelete={handleDelete}
-        userRole={session.role}
+        userSession={session}
       />
     </main>
   );

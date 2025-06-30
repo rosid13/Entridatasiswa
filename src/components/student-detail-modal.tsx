@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { type User } from 'firebase/auth';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,8 @@ import { format } from "date-fns";
 import { id } from 'date-fns/locale';
 import type { Student } from '@/types/student';
 import { Badge } from './ui/badge';
+import CorrectionRequestModal from './correction-request-modal';
+import type { AppSession } from '@/app/page';
 
 interface StudentDetailModalProps {
   student: Student | null;
@@ -32,7 +35,7 @@ interface StudentDetailModalProps {
   onClose: () => void;
   onEdit: (student: Student) => void;
   onDelete: (studentId: string) => void;
-  userRole: string;
+  userSession: AppSession | null;
 }
 
 const DetailItem = ({ label, value }: { label: string; value?: string | number | null }) => (
@@ -46,8 +49,9 @@ const SectionHeader = ({ children }: { children: React.ReactNode }) => (
   <h3 className="font-semibold text-lg text-foreground mb-2">{children}</h3>
 )
 
-export default function StudentDetailModal({ student, isOpen, onClose, onEdit, onDelete, userRole }: StudentDetailModalProps) {
+export default function StudentDetailModal({ student, isOpen, onClose, onEdit, onDelete, userSession }: StudentDetailModalProps) {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [isCorrectionModalOpen, setIsCorrectionModalOpen] = useState(false);
 
   if (!student) return null;
 
@@ -172,17 +176,20 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
           </ScrollArea>
           <DialogFooter className="pt-4 sm:justify-between w-full border-t">
               <div>
-                {userRole === 'admin' && (
+                {userSession?.role === 'admin' && (
                   <Button variant="destructive" onClick={() => setIsAlertOpen(true)}>
                       Hapus Data
                   </Button>
                 )}
               </div>
-              <div className='flex gap-2'>
-                 <Button variant="outline" onClick={onClose}>
+              <div className='flex gap-2 flex-wrap justify-end'>
+                  <Button variant="secondary" onClick={() => setIsCorrectionModalOpen(true)}>
+                      Ajukan Perbaikan Data
+                  </Button>
+                  <Button variant="outline" onClick={onClose}>
                       Tutup
                   </Button>
-                  {userRole === 'admin' && (
+                  {userSession?.role === 'admin' && (
                     <Button onClick={() => onEdit(student)}>
                         Edit Data
                     </Button>
@@ -207,6 +214,12 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <CorrectionRequestModal 
+        isOpen={isCorrectionModalOpen}
+        onClose={() => setIsCorrectionModalOpen(false)}
+        student={student}
+        user={userSession?.user ?? null}
+      />
     </>
   );
 }
