@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Student Data Entry',
-  description: 'A simple web application for student data entry.',
+  title: 'Manajemen Data Siswa',
+  description: 'Aplikasi manajemen data siswa modern.',
 };
 
 export default function RootLayout({
