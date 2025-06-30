@@ -72,7 +72,11 @@ export default function RequestsPage() {
             setPageLoading(false);
         }, (error) => {
             console.error("Error fetching requests: ", error);
-            toast({ variant: "destructive", title: "Gagal memuat data." });
+            toast({ 
+                variant: "destructive", 
+                title: "Gagal Memuat Permintaan",
+                description: "Tidak dapat mengambil daftar permintaan perbaikan. Periksa koneksi Anda.",
+            });
             setPageLoading(false);
         });
         
@@ -111,8 +115,8 @@ export default function RequestsPage() {
             console.error(`Error ${action}ing request: `, error);
             toast({
                 variant: "destructive",
-                title: "Gagal!",
-                description: "Terjadi kesalahan saat memproses permintaan.",
+                title: "Gagal Memproses Permintaan",
+                description: "Terjadi kesalahan saat memproses permintaan. Coba lagi.",
             });
         } finally {
             setIsSubmitting(false);

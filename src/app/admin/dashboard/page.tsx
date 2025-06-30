@@ -78,7 +78,11 @@ export default function AdminDashboardPage() {
                 });
             } catch (error) {
                 console.error("Error fetching stats:", error);
-                toast({ variant: "destructive", title: "Gagal memuat statistik." });
+                toast({ 
+                    variant: "destructive", 
+                    title: "Gagal Memuat Statistik",
+                    description: "Tidak dapat mengambil data statistik. Periksa koneksi Anda."
+                });
             } finally {
                 setStatsLoading(false);
             }
@@ -89,9 +93,23 @@ export default function AdminDashboardPage() {
         // Also set up listeners for real-time updates
         studentsUnsub = onSnapshot(collection(db, "siswa"), (snap) => {
              setStats(prev => ({...prev, studentCount: snap.size}));
+        }, (error) => {
+            console.error("Real-time student count failed:", error);
+            toast({
+                variant: "destructive",
+                title: "Gagal Update Real-time",
+                description: "Tidak dapat memperbarui jumlah siswa secara real-time.",
+            });
         });
         requestsUnsub = onSnapshot(query(collection(db, "correctionRequests"), where("status", "==", "pending")), (snap) => {
              setStats(prev => ({...prev, pendingRequestsCount: snap.size}));
+        }, (error) => {
+            console.error("Real-time request count failed:", error);
+            toast({
+                variant: "destructive",
+                title: "Gagal Update Real-time",
+                description: "Tidak dapat memperbarui jumlah permintaan secara real-time.",
+            });
         });
 
         return () => {

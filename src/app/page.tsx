@@ -44,6 +44,11 @@ export default function Home() {
             await setDoc(userRoleRef, { role: 'user' });
           } catch (error) {
             console.error("Failed to create user role:", error);
+            toast({
+              variant: "destructive",
+              title: "Gagal Menginisialisasi Akun",
+              description: "Tidak dapat mengatur peran pengguna. Coba muat ulang halaman.",
+            });
           }
         }
         
@@ -62,7 +67,7 @@ export default function Home() {
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, [router, toast]);
 
   const handleStudentClick = (student: Student) => {
     setSelectedStudent(student);
@@ -104,8 +109,8 @@ export default function Home() {
        console.error("Error deleting document: ", error);
        toast({
         variant: "destructive",
-        title: "Gagal!",
-        description: "Terjadi kesalahan saat menghapus data. Anda mungkin tidak memiliki izin.",
+        title: "Gagal Menghapus Data",
+        description: "Terjadi kesalahan. Periksa koneksi atau hak akses Anda.",
       });
     }
   };
