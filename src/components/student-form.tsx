@@ -185,8 +185,15 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
+      // Sanitize the data for Firestore by converting undefined to null
+      const sanitizedValues: { [key: string]: any } = {};
+      Object.keys(values).forEach(key => {
+        const value = values[key as keyof typeof values];
+        sanitizedValues[key] = value === undefined ? null : value;
+      });
+      
       const dataToSave = {
-        ...values,
+        ...sanitizedValues,
         birthDate: values.birthDate ? values.birthDate.toISOString() : null,
       };
 
@@ -200,7 +207,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         const updatedStudent: Student = {
             ...studentToEdit,
             ...dataToSave,
-            birthDate: dataToSave.birthDate || undefined,
+            birthDate: dataToSave.birthDate,
         }
         onSuccess(updatedStudent);
       } else {
