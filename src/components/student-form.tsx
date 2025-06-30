@@ -171,11 +171,25 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
 
   React.useEffect(() => {
     if (isEditMode && studentToEdit) {
-      const studentData = {
-        ...studentToEdit,
+      // Create a mutable copy of the student data
+      const studentDataForForm: { [key: string]: any } = { ...studentToEdit };
+
+      // Sanitize null values to empty strings for form compatibility.
+      // Firestore may return null for empty fields, but our form validation
+      // expects strings.
+      Object.keys(studentDataForForm).forEach(key => {
+        if (studentDataForForm[key] === null) {
+          studentDataForForm[key] = '';
+        }
+      });
+      
+      // Also convert the birthDate string from ISO format to a Date object
+      const finalDataForForm = {
+        ...studentDataForForm,
         birthDate: studentToEdit.birthDate ? new Date(studentToEdit.birthDate) : undefined,
       };
-      form.reset(studentData);
+
+      form.reset(finalDataForForm);
     } else {
       form.reset(defaultFormValues);
     }
@@ -185,16 +199,14 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const sanitizedValues: { [key: string]: any } = {};
-      Object.keys(values).forEach(key => {
-        const value = values[key as keyof typeof values];
-        sanitizedValues[key] = value === undefined ? null : value;
+      // Sanitize form values for Firestore. Convert empty strings and undefined to null.
+      const dataToSave: { [key: string]: any } = {};
+      Object.entries(values).forEach(([key, value]) => {
+        dataToSave[key] = value === undefined || value === "" ? null : value;
       });
       
-      const dataToSave = {
-        ...sanitizedValues,
-        birthDate: values.birthDate ? values.birthDate.toISOString() : null,
-      };
+      // Specifically handle the date conversion
+      dataToSave.birthDate = values.birthDate ? values.birthDate.toISOString() : null;
 
       if (isEditMode && studentToEdit) {
         const studentRef = doc(db, "siswa", studentToEdit.id);
@@ -204,10 +216,10 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
           description: "Data siswa telah berhasil diperbarui.",
         });
         const updatedStudent: Student = {
-            ...studentToEdit,
-            ...dataToSave,
-            birthDate: dataToSave.birthDate,
-        }
+          ...studentToEdit,
+          ...dataToSave,
+          birthDate: dataToSave.birthDate,
+        };
         onSuccess(updatedStudent);
       } else {
         await addDoc(collection(db, "siswa"), {
