@@ -11,7 +11,7 @@ import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -185,7 +185,6 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      // Sanitize the data for Firestore by converting undefined to null
       const sanitizedValues: { [key: string]: any } = {};
       Object.keys(values).forEach(key => {
         const value = values[key as keyof typeof values];
@@ -239,7 +238,14 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <Card>
           <CardHeader>
+            <CardTitle>{isEditMode ? "Edit Data Siswa" : "Formulir Pendaftaran Siswa Baru"}</CardTitle>
+            <CardDescription>Pastikan semua data diisi dengan benar dan sesuai dengan dokumen yang valid.</CardDescription>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
             <CardTitle>Informasi Pribadi</CardTitle>
+            <CardDescription>Detail identitas dasar siswa.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FormField
@@ -395,6 +401,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         <Card>
           <CardHeader>
             <CardTitle>Alamat Lengkap</CardTitle>
+            <CardDescription>Informasi tempat tinggal siswa sesuai domisili.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <FormField
@@ -414,7 +421,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                <FormField
                 control={form.control}
                 name="rt"
@@ -500,6 +507,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         <Card>
           <CardHeader>
             <CardTitle>Informasi Kontak & Lainnya</CardTitle>
+            <CardDescription>Data pendukung untuk keperluan komunikasi dan administratif.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
@@ -574,6 +582,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         <Card>
           <CardHeader>
             <CardTitle>Data Keluarga</CardTitle>
+            <CardDescription>Informasi mengenai orang tua atau wali siswa.</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="father" className="w-full">
@@ -582,7 +591,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <TabsTrigger value="mother">Data Ibu</TabsTrigger>
                 <TabsTrigger value="guardian">Data Wali</TabsTrigger>
               </TabsList>
-              <TabsContent value="father" className="mt-6 space-y-6">
+              <TabsContent value="father" className="mt-6">
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
@@ -685,7 +694,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                     />
                  </div>
               </TabsContent>
-              <TabsContent value="mother" className="mt-6 space-y-6">
+              <TabsContent value="mother" className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
@@ -788,7 +797,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                     />
                  </div>
               </TabsContent>
-              <TabsContent value="guardian" className="mt-6 space-y-6">
+              <TabsContent value="guardian" className="mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
@@ -898,6 +907,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         <Card>
           <CardHeader>
             <CardTitle>Data Tambahan Siswa</CardTitle>
+            <CardDescription>Informasi pelengkap untuk keperluan administratif dan program bantuan.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FormField
@@ -1011,7 +1021,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Berat Badan (kg)</FormLabel>
                   <FormControl>
-                    <Input type="text" placeholder="Contoh: 45" {...field} />
+                    <Input type="text" placeholder="Contoh: 45.5" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1024,7 +1034,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Tinggi Badan (cm)</FormLabel>
                   <FormControl>
-                    <Input type="text" placeholder="Contoh: 160" {...field} />
+                    <Input type="text" placeholder="Contoh: 160.5" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1037,7 +1047,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Lingkar Kepala (cm)</FormLabel>
                   <FormControl>
-                    <Input type="text" placeholder="Contoh: 55" {...field} />
+                    <Input type="text" placeholder="Contoh: 55.5" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1059,7 +1069,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                   Menyimpan...
                 </>
               ) : (
-                isEditMode ? "Simpan Perubahan" : "Simpan Data"
+                isEditMode ? "Simpan Perubahan" : "Simpan Data Siswa"
               )}
             </Button>
         </div>

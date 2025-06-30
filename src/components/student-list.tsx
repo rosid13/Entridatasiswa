@@ -11,10 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import type { Student } from '@/types/student';
+import { Search } from 'lucide-react';
+import { Badge } from './ui/badge';
 
 interface StudentListProps {
   onStudentClick: (student: Student) => void;
@@ -58,14 +60,16 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     <Card className="mt-12">
       <CardHeader>
         <CardTitle>Data Siswa Terdaftar</CardTitle>
+        <CardDescription>Cari dan kelola data siswa yang sudah terdaftar dalam sistem.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari Nama atau NISN..."
+            placeholder="Cari berdasarkan Nama atau NISN..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
+            className="w-full pl-10"
           />
         </div>
         {loading ? (
@@ -91,7 +95,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
                   <TableRow key={student.id} onClick={() => onStudentClick(student)} className="cursor-pointer">
                     <TableCell className="font-medium">{student.fullName}</TableCell>
                     <TableCell>{student.nisn || '-'}</TableCell>
-                    <TableCell>{student.kelas || '-'}</TableCell>
+                    <TableCell><Badge variant="outline">{student.kelas || '-'}</Badge></TableCell>
                     <TableCell>{student.gender}</TableCell>
                     <TableCell>{student.mobilePhone}</TableCell>
                   </TableRow>

@@ -25,6 +25,8 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { id } from 'date-fns/locale';
 import type { Student } from '@/types/student';
+import { Separator } from './ui/separator';
+import { Badge } from './ui/badge';
 
 interface StudentDetailModalProps {
   student: Student | null;
@@ -35,11 +37,15 @@ interface StudentDetailModalProps {
 }
 
 const DetailItem = ({ label, value }: { label: string; value?: string | number | null }) => (
-  <div className="grid grid-cols-2 gap-2 text-sm">
+  <div className="grid grid-cols-2 gap-2 text-sm py-2">
     <p className="text-muted-foreground">{label}</p>
-    <p className="font-medium break-words">{value || "-"}</p>
+    <p className="font-medium break-words text-foreground">{value || "-"}</p>
   </div>
 );
+
+const SectionHeader = ({ children }: { children: React.ReactNode }) => (
+  <h3 className="font-semibold text-lg text-foreground mb-2">{children}</h3>
+)
 
 export default function StudentDetailModal({ student, isOpen, onClose, onEdit, onDelete }: StudentDetailModalProps) {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -65,21 +71,21 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Detail Siswa: {student.fullName}</DialogTitle>
-            <DialogDescription>
-              Informasi lengkap mengenai siswa yang terdaftar.
-            </DialogDescription>
+            <DialogTitle className="text-2xl">Detail Siswa</DialogTitle>
+            <div className='flex items-center gap-4'>
+                <p className='text-xl text-primary font-semibold'>{student.fullName}</p>
+                <Badge variant="outline">{student.kelas || 'Belum ada kelas'}</Badge>
+            </div>
           </DialogHeader>
-          <ScrollArea className="max-h-[70vh] pr-6">
+          <ScrollArea className="max-h-[70vh] pr-6 -mr-2">
             <div className="space-y-6 py-4">
               
               <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Informasi Pribadi</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 border-t pt-4">
+                <SectionHeader>Informasi Pribadi</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 border-t">
                   <DetailItem label="Nama Lengkap" value={student.fullName} />
                   <DetailItem label="Jenis Kelamin" value={student.gender} />
                   <DetailItem label="NISN" value={student.nisn} />
-                  <DetailItem label="Kelas" value={student.kelas} />
                   <DetailItem label="NIK" value={student.nik} />
                   <DetailItem label="Tempat Lahir" value={student.birthPlace} />
                   <DetailItem label="Tanggal Lahir" value={formatDate(student.birthDate)} />
@@ -88,11 +94,10 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Alamat Lengkap</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 border-t pt-4">
+                <SectionHeader>Alamat Lengkap</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 border-t">
                   <DetailItem label="Alamat" value={student.address} />
-                  <DetailItem label="RT" value={student.rt} />
-                  <DetailItem label="RW" value={student.rw} />
+                  <DetailItem label="RT / RW" value={`${student.rt || '-'} / ${student.rw || '-'}`} />
                   <DetailItem label="Dusun" value={student.dusun} />
                   <DetailItem label="Kelurahan" value={student.kelurahan} />
                   <DetailItem label="Kecamatan" value={student.kecamatan} />
@@ -101,8 +106,8 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
               </div>
               
               <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Informasi Kontak & Lainnya</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 border-t pt-4">
+                <SectionHeader>Informasi Kontak & Lainnya</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 border-t">
                   <DetailItem label="Jenis Tinggal" value={student.residenceType} />
                   <DetailItem label="Alat Transportasi" value={student.transportMode} />
                   <DetailItem label="Telepon" value={student.phone} />
@@ -111,7 +116,7 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Data Keluarga</h3>
+                <SectionHeader>Data Keluarga</SectionHeader>
                 <div className="border-t pt-4">
                   <Tabs defaultValue="father" className="w-full">
                     <TabsList className="grid w-full grid-cols-3">
@@ -119,7 +124,7 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
                       <TabsTrigger value="mother">Data Ibu</TabsTrigger>
                       <TabsTrigger value="guardian">Data Wali</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="father" className="mt-4 space-y-2 p-1">
+                    <TabsContent value="father" className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 p-1">
                       <DetailItem label="Nama Ayah" value={student.fatherName} />
                       <DetailItem label="Tahun Lahir" value={student.fatherBirthYear} />
                       <DetailItem label="Pendidikan" value={student.fatherEducation} />
@@ -127,7 +132,7 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
                       <DetailItem label="Penghasilan" value={student.fatherIncome} />
                       <DetailItem label="NIK Ayah" value={student.fatherNik} />
                     </TabsContent>
-                    <TabsContent value="mother" className="mt-4 space-y-2 p-1">
+                    <TabsContent value="mother" className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 p-1">
                       <DetailItem label="Nama Ibu" value={student.motherName} />
                       <DetailItem label="Tahun Lahir" value={student.motherBirthYear} />
                       <DetailItem label="Pendidikan" value={student.motherEducation} />
@@ -135,7 +140,7 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
                       <DetailItem label="Penghasilan" value={student.motherIncome} />
                       <DetailItem label="NIK Ibu" value={student.motherNik} />
                     </TabsContent>
-                    <TabsContent value="guardian" className="mt-4 space-y-2 p-1">
+                    <TabsContent value="guardian" className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 p-1">
                       <DetailItem label="Nama Wali" value={student.guardianName} />
                       <DetailItem label="Tahun Lahir" value={student.guardianBirthYear} />
                       <DetailItem label="Pendidikan" value={student.guardianEducation} />
@@ -148,8 +153,8 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-semibold text-lg">Data Tambahan Siswa</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 border-t pt-4">
+                <SectionHeader>Data Tambahan Siswa</SectionHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 border-t">
                   <DetailItem label="No. KK" value={student.kkNumber} />
                   <DetailItem label="Anak ke-" value={student.childOrder} />
                   <DetailItem label="Jml Saudara Kandung" value={student.siblingsCount} />
@@ -166,15 +171,20 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
 
             </div>
           </ScrollArea>
-          <DialogFooter className="pt-4 sm:justify-between">
+          <DialogFooter className="pt-4 sm:justify-between w-full border-t">
               <div>
                 <Button variant="destructive" onClick={() => setIsAlertOpen(true)}>
                     Hapus Data
                 </Button>
               </div>
-              <Button variant="outline" onClick={() => onEdit(student)}>
-                  Edit Data
-              </Button>
+              <div className='flex gap-2'>
+                 <Button variant="outline" onClick={onClose}>
+                      Tutup
+                  </Button>
+                  <Button onClick={() => onEdit(student)}>
+                      Edit Data
+                  </Button>
+              </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
