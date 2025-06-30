@@ -1,18 +1,23 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import StudentForm from '@/components/student-form';
 import StudentList from '@/components/student-list';
 import StudentDetailModal from '@/components/student-detail-modal';
+import AdminPanel from '@/components/admin-panel';
 import { db, auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { Student } from '@/types/student';
 import { Button } from '@/components/ui/button';
 import { Loader2, LogOut } from 'lucide-react';
 
+interface AppSession {
+  user: User;
+  role: string;
+}
 
 export default function Home() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -20,15 +25,30 @@ export default function Home() {
   const formRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<AppSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        setUser(currentUser);
+        const userRoleRef = doc(db, "userRoles", currentUser.uid);
+        const docSnap = await getDoc(userRoleRef);
+
+        let userRole = 'user'; // Peran default
+        if (docSnap.exists() && docSnap.data().role) {
+          userRole = docSnap.data().role;
+        } else if (!docSnap.exists()) {
+          // Buat dokumen peran untuk pengguna baru
+          try {
+            await setDoc(userRoleRef, { role: 'user' });
+          } catch (error) {
+            console.error("Failed to create user role:", error);
+          }
+        }
+        setSession({ user: currentUser, role: userRole });
       } else {
         router.push('/login');
+        setSession(null);
       }
       setLoading(false);
     });
@@ -108,7 +128,7 @@ export default function Home() {
     );
   }
 
-  if (!user) {
+  if (!session) {
     return null; // or a redirect component, but useEffect handles it
   }
 
@@ -132,6 +152,7 @@ export default function Home() {
             onCancel={handleCancelEdit}
           />
         </div>
+        {session.role === 'admin' && <AdminPanel />}
         <StudentList onStudentClick={handleStudentClick} />
       </div>
        <StudentDetailModal
