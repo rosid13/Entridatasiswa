@@ -63,7 +63,18 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       return;
     }
 
-    // 1. Define logical column headers
+    // 1. Define styles
+    const titleStyle = { font: { sz: 16, bold: true }, alignment: { horizontal: 'center', vertical: 'center' } };
+    const subtitleStyle = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center' } };
+    const headerStyle = {
+        font: { bold: true },
+        border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
+    };
+    const cellStyle = {
+        border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
+    };
+
+    // 2. Define logical column headers
     const headers = [
       // Data Pribadi
       "Nama Lengkap", "Jenis Kelamin", "NISN", "Kelas", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama",
@@ -83,7 +94,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       "Tanggal Dibuat"
     ];
 
-    // 2. Map student data to match the header order
+    // 3. Map student data
     const dataToExport = students.map(s => ([
       s.fullName, s.gender, s.nisn ?? '', s.kelas ?? '', s.birthPlace ?? '', s.birthDate ? format(new Date(s.birthDate), 'dd-MM-yyyy') : '', s.nik ?? '', s.religion,
       s.address ?? '', s.rt ?? '', s.rw ?? '', s.dusun ?? '', s.kelurahan ?? '', s.kecamatan ?? '', s.postalCode ?? '',
@@ -95,42 +106,62 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       s.createdAt ? format(new Date(s.createdAt), 'dd-MM-yyyy HH:mm:ss') : ''
     ]));
     
-    // 3. Create worksheet with title, date, and data
-    const workbook = XLSX.utils.book_new();
+    // 4. Create worksheet with all data
     const finalData = [
       ["Laporan Data Siswa - Student Data Entry"],
       [`Tanggal Ekspor: ${format(new Date(), "dd MMMM yyyy HH:mm", { locale: id })}`],
-      [], // Blank row for spacing
+      [],
       headers,
       ...dataToExport
     ];
     
     const worksheet = XLSX.utils.aoa_to_sheet(finalData);
 
-    // 4. Set column widths and formatting
-    const colWidths = headers.map(header => ({ wch: header.length > 20 ? 30 : header.length + 5 }));
-    worksheet['!cols'] = colWidths;
-    
-    // Merge title cell
-    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }];
-    worksheet['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } });
-    
-    // Ensure number-like fields are treated as text by iterating through cells
-    for (let R = 4; R < finalData.length; ++R) {
-        // NISN, NIK, Phone numbers etc.
-        const textFormatCells = [2, 6, 9, 10, 14, 17, 18, 24, 29, 35, 36, 37, 40, 41, 42, 43, 44];
-        textFormatCells.forEach(C => {
-            const cellAddress = XLSX.utils.encode_cell({r:R, c:C});
-            if (worksheet[cellAddress]) {
-                worksheet[cellAddress].t = 's'; // 's' forces the cell type to string
-            }
-        });
-    }
+    // 5. Apply styling, formatting, and auto-fit columns
+    worksheet['A1'].s = titleStyle;
+    worksheet['A2'].s = subtitleStyle;
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DataSiswa");
+    const headerRowIndex = 3; // Headers start at row 4 (index 3)
+    const dataEndIndex = headerRowIndex + dataToExport.length;
+
+    for (let R = headerRowIndex; R <= dataEndIndex; ++R) {
+        for (let C = 0; C < headers.length; ++C) {
+            const cellAddress = XLSX.utils.encode_cell({r: R, c: C});
+            if (!worksheet[cellAddress]) continue;
+
+            worksheet[cellAddress].s = (R === headerRowIndex) ? headerStyle : cellStyle;
+
+            const textFormatColumnIndices = [2, 6, 9, 10, 14, 17, 18, 20, 24, 26, 30, 32, 36, 37, 38, 39, 41, 42, 44];
+            if (textFormatColumnIndices.includes(C) && R > headerRowIndex) {
+                worksheet[cellAddress].t = 's';
+            }
+        }
+    }
     
-    // 5. Trigger download
-    XLSX.writeFile(workbook, "Data_Siswa_Lengkap.xlsx", { bookType: 'xlsx', type: 'buffer' });
+    const colWidths = headers.map((header, i) => {
+      const dataForCol = [header, ...dataToExport.map(row => row[i])];
+      const maxLength = dataForCol.reduce((max, cell) => {
+          const cellLength = cell ? String(cell).length : 0;
+          return Math.max(max, cellLength);
+      }, 0);
+      return { wch: maxLength + 2 }; // +2 for padding
+    });
+    worksheet['!cols'] = colWidths;
+
+    // 6. Merge title and subtitle cells
+    worksheet['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } }
+    ];
+    
+    // 7. Add AutoFilter to the header row
+    const filterRange = { s: { r: headerRowIndex, c: 0 }, e: { r: dataEndIndex, c: headers.length - 1 } };
+    worksheet['!autofilter'] = { ref: XLSX.utils.encode_range(filterRange) };
+
+    // 8. Create workbook and trigger download
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DataSiswa");
+    XLSX.writeFile(workbook, "Data_Siswa_Lengkap_Styled.xlsx", { bookType: 'xlsx', type: 'buffer' });
     
     toast({
         title: "Ekspor Berhasil",
