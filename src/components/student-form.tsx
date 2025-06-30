@@ -154,7 +154,7 @@ export default function StudentForm() {
         birthDate: values.birthDate ? values.birthDate.toISOString() : null,
         createdAt: new Date().toISOString(),
       };
-      await addDoc(collection(db, "students"), dataToSave);
+      await addDoc(collection(db, "siswa"), dataToSave);
       toast({
         title: "Sukses!",
         description: "Data siswa berhasil disimpan.",

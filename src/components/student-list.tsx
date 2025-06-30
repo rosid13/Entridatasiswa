@@ -27,7 +27,7 @@ export default function StudentList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "students"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "siswa"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const studentsData: Student[] = [];
       querySnapshot.forEach((doc) => {
