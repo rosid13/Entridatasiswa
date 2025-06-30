@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Loader2, GraduationCap } from "lucide-react";
+import Footer from '@/components/footer';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid." }),
@@ -84,67 +85,70 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="text-center">
-            <GraduationCap className="mx-auto h-12 w-12 text-primary mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight whitespace-nowrap">
-            SMP SUNAN AL-ANBIYA
-            </h1>
-            <h2 className="text-2xl sm:text-3xl font-bold text-primary -mt-1">TAMAN</h2>
-            <p className="mt-4 text-muted-foreground">
-            Sistem Manajemen Data Siswa
-            </p>
-        </div>
-        <Card>
-            <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Selamat Datang</CardTitle>
-            <CardDescription>Masuk untuk mengelola data siswa</CardDescription>
-            </CardHeader>
-            <CardContent>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                        <Input type="email" placeholder="contoh@email.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Memproses...
-                    </>
-                    ) : (
-                    "Login"
-                    )}
-                </Button>
-                </form>
-            </Form>
-            </CardContent>
-        </Card>
-      </div>
-    </main>
+    <div className="flex flex-col min-h-screen bg-background">
+        <main className="flex flex-grow flex-col items-center justify-center p-4">
+            <div className="w-full max-w-sm space-y-8">
+                <div className="text-center">
+                    <GraduationCap className="mx-auto h-12 w-12 text-primary mb-4" />
+                    <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight whitespace-nowrap">
+                    SMP SUNAN AL-ANBIYA
+                    </h1>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-primary -mt-1">TAMAN</h2>
+                    <p className="mt-4 text-muted-foreground">
+                    Sistem Manajemen Data Siswa
+                    </p>
+                </div>
+                <Card>
+                    <CardHeader className="text-center">
+                    <CardTitle className="text-2xl">Selamat Datang</CardTitle>
+                    <CardDescription>Masuk untuk mengelola data siswa</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                <Input type="email" placeholder="contoh@email.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                <Input type="password" placeholder="••••••••" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Memproses...
+                            </>
+                            ) : (
+                            "Login"
+                            )}
+                        </Button>
+                        </form>
+                    </Form>
+                    </CardContent>
+                </Card>
+            </div>
+        </main>
+        <Footer />
+    </div>
   );
 }
