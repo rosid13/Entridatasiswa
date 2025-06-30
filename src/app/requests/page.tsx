@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -66,11 +67,7 @@ export default function RequestsPage() {
                 id: doc.id,
                 ...doc.data()
             } as CorrectionRequest));
-
-            // Urutkan di sisi klien untuk menghindari kebutuhan indeks komposit.
-            // Untuk aplikasi produksi, disarankan untuk membuat indeks di Firebase.
             requestsData.sort((a, b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime());
-
             setRequests(requestsData);
             setPageLoading(false);
         }, (error) => {
@@ -143,7 +140,7 @@ export default function RequestsPage() {
         <main className="min-h-screen bg-secondary p-4 sm:p-6 md:p-8">
             <div className="max-w-7xl mx-auto">
                 <header className="flex items-center gap-4 mb-10">
-                    <Link href="/" passHref>
+                    <Link href="/admin/dashboard" passHref>
                         <Button variant="outline" size="icon">
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

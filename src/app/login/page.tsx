@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -6,7 +7,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,9 +28,17 @@ export default function LoginPage() {
   const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
 
   React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        router.push("/");
+        const userRoleRef = doc(db, "userRoles", user.uid);
+        const docSnap = await getDoc(userRoleRef);
+        const userRole = (docSnap.exists() && docSnap.data().role) ? docSnap.data().role : 'user';
+        
+        if (userRole === 'admin') {
+            router.push('/admin/dashboard');
+        } else {
+            router.push('/');
+        }
       } else {
         setIsCheckingAuth(false);
       }
@@ -51,9 +61,9 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Login Berhasil!",
-        description: "Selamat datang, Anda berhasil masuk.",
+        description: "Selamat datang, Anda akan diarahkan.",
       });
-      router.push("/");
+      // The onAuthStateChanged listener will handle redirection.
     } catch (error: any) {
       console.error("Login failed: ", error);
       toast({

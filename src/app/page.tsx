@@ -1,18 +1,19 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import StudentForm from '@/components/student-form';
 import StudentList from '@/components/student-list';
 import StudentDetailModal from '@/components/student-detail-modal';
-import AdminPanel from '@/components/admin-panel';
 import { db, auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { Student } from '@/types/student';
 import { Button } from '@/components/ui/button';
-import { Loader2, LogOut } from 'lucide-react';
+import { Loader2, LogOut, LayoutDashboard } from 'lucide-react';
 
 export interface AppSession {
   user: User;
@@ -45,7 +46,14 @@ export default function Home() {
             console.error("Failed to create user role:", error);
           }
         }
+        
+        // Admins should start at the dashboard, users at the student list
+        if (userRole === 'admin' && window.location.pathname !== '/admin/dashboard' && window.location.pathname === '/login') {
+            router.push('/admin/dashboard');
+        }
+        
         setSession({ user: currentUser, role: userRole });
+
       } else {
         router.push('/login');
         setSession(null);
@@ -140,10 +148,20 @@ export default function Home() {
                 <h1 className="text-4xl md:text-5xl font-bold text-foreground">Manajemen Data Siswa</h1>
                 <p className="text-muted-foreground mt-3 max-w-2xl">Platform terpusat untuk mengelola informasi siswa secara efisien, modern, dan aman.</p>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-            </Button>
+            <div className="flex items-center gap-2">
+                {session.role === 'admin' && (
+                  <Link href="/admin/dashboard" passHref>
+                      <Button variant="outline">
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          Dashboard
+                      </Button>
+                  </Link>
+                )}
+                <Button variant="outline" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                </Button>
+            </div>
         </header>
         <div ref={formRef}>
           <StudentForm 
@@ -152,7 +170,6 @@ export default function Home() {
             onCancel={handleCancelEdit}
           />
         </div>
-        {session.role === 'admin' && <AdminPanel />}
         <StudentList onStudentClick={handleStudentClick} />
       </div>
        <StudentDetailModal

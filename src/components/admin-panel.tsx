@@ -1,88 +1,24 @@
+
 "use client";
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Loader2, FileCheck2 } from 'lucide-react';
+import { FileCheck2 } from 'lucide-react';
 
 export default function AdminPanel() {
-  const [userId, setUserId] = useState('');
-  const [role, setRole] = useState('admin');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-
-  const handleSetAdmin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userId) {
-      toast({
-        variant: 'destructive',
-        title: 'Gagal!',
-        description: 'User ID tidak boleh kosong.',
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const userRoleRef = doc(db, 'userRoles', userId);
-      await setDoc(userRoleRef, { role }, { merge: true });
-      toast({
-        title: 'Sukses!',
-        description: `Peran untuk user ${userId} telah diatur menjadi ${role}.`,
-      });
-      setUserId('');
-    } catch (error) {
-      console.error("Error setting user role: ", error);
-      toast({
-        variant: 'destructive',
-        title: 'Gagal!',
-        description: 'Terjadi kesalahan saat mengatur peran user.',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+  // This component is being deprecated in favor of the new /admin/dashboard page.
+  // The content is kept minimal to avoid breaking changes if it's referenced elsewhere unexpectedly.
   return (
-    <Card className="mt-12">
-      <CardHeader>
-        <CardTitle>Admin Panel</CardTitle>
-        <CardDescription>Atur peran pengguna dan kelola permintaan perbaikan data.</CardDescription>
-      </CardHeader>
-      <CardContent className="grid md:grid-cols-2 gap-8">
-        <form onSubmit={handleSetAdmin} className="space-y-4">
-          <Label htmlFor="userId" className='text-base font-semibold'>Atur Peran Admin</Label>
-           <Input
-              id="userId"
-              type="text"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="Masukkan User ID dari Firebase Auth"
-            />
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Jadikan Admin
-          </Button>
-        </form>
-         <div className="space-y-4">
-            <Label className='text-base font-semibold'>Manajemen Data</Label>
-            <p className="text-sm text-muted-foreground">
-                Tinjau dan proses permintaan perbaikan data yang diajukan oleh pengguna.
-            </p>
-            <Link href="/requests" passHref>
-                <Button variant="outline" className="w-full">
-                    <FileCheck2 className="mr-2 h-4 w-4" />
-                    Lihat Permintaan Perbaikan
-                </Button>
-            </Link>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="mt-12 p-4 border rounded-lg bg-card">
+        <p className="text-muted-foreground mb-4">
+            Manajemen admin telah dipindahkan ke halaman dashboard.
+        </p>
+        <Link href="/admin/dashboard" passHref>
+            <Button variant="outline">
+                <FileCheck2 className="mr-2 h-4 w-4" />
+                Buka Dashboard Admin
+            </Button>
+        </Link>
+    </div>
   );
 }
