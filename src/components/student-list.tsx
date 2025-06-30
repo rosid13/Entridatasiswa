@@ -5,6 +5,7 @@ import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import {
   Table,
   TableBody,
@@ -62,63 +63,79 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       return;
     }
 
-    const dataToExport = students.map(s => ({
-      "Nama Lengkap": s.fullName,
-      "Jenis Kelamin": s.gender,
-      "NISN": s.nisn ?? '',
-      "Kelas": s.kelas ?? '',
-      "Tempat Lahir": s.birthPlace ?? '',
-      "Tanggal Lahir": s.birthDate ? format(new Date(s.birthDate), 'dd-MM-yyyy') : '',
-      "NIK": s.nik ?? '',
-      "Agama": s.religion,
-      "Alamat": s.address ?? '',
-      "RT": s.rt ?? '',
-      "RW": s.rw ?? '',
-      "Dusun": s.dusun ?? '',
-      "Kelurahan": s.kelurahan ?? '',
-      "Kecamatan": s.kecamatan ?? '',
-      "Kode Pos": s.postalCode ?? '',
-      "Jenis Tinggal": s.residenceType,
-      "Alat Transportasi": s.transportMode,
-      "Telepon": s.phone ?? '',
-      "No. HP": s.mobilePhone,
-      "Nama Ayah": s.fatherName,
-      "Tahun Lahir Ayah": s.fatherBirthYear ?? '',
-      "Pendidikan Ayah": s.fatherEducation ?? '',
-      "Pekerjaan Ayah": s.fatherOccupation ?? '',
-      "Penghasilan Ayah": s.fatherIncome ?? '',
-      "NIK Ayah": s.fatherNik ?? '',
-      "Nama Ibu": s.motherName,
-      "Tahun Lahir Ibu": s.motherBirthYear ?? '',
-      "Pendidikan Ibu": s.motherEducation ?? '',
-      "Pekerjaan Ibu": s.motherOccupation ?? '',
-      "Penghasilan Ibu": s.motherIncome ?? '',
-      "NIK Ibu": s.motherNik ?? '',
-      "Nama Wali": s.guardianName ?? '',
-      "Tahun Lahir Wali": s.guardianBirthYear ?? '',
-      "Pendidikan Wali": s.guardianEducation ?? '',
-      "Pekerjaan Wali": s.guardianOccupation ?? '',
-      "Penghasilan Wali": s.guardianIncome ?? '',
-      "NIK Wali": s.guardianNik ?? '',
-      "Nomor KIP": s.kipNumber ?? '',
-      "Nama di KIP": s.kipName ?? '',
-      "Nomor KKS/PKH": s.kksPkhNumber ?? '',
-      "No. Registrasi Akta Lahir": s.birthCertificateRegNo ?? '',
-      "Sekolah Asal": s.previousSchool ?? '',
-      "Anak ke-": s.childOrder ?? '',
-      "No. KK": s.kkNumber ?? '',
-      "Berat Badan (kg)": s.weight ?? '',
-      "Tinggi Badan (cm)": s.height ?? '',
-      "Lingkar Kepala (cm)": s.headCircumference ?? '',
-      "Jml Saudara Kandung": s.siblingsCount ?? '',
-      "Tanggal Dibuat": s.createdAt ? format(new Date(s.createdAt), 'dd-MM-yyyy HH:mm:ss') : '',
-    }));
+    // 1. Define logical column headers
+    const headers = [
+      // Data Pribadi
+      "Nama Lengkap", "Jenis Kelamin", "NISN", "Kelas", "Tempat Lahir", "Tanggal Lahir", "NIK", "Agama",
+      // Alamat
+      "Alamat", "RT", "RW", "Dusun", "Kelurahan", "Kecamatan", "Kode Pos",
+      // Kontak & Lainnya
+      "Jenis Tinggal", "Alat Transportasi", "Telepon", "No. HP",
+      // Data Ayah
+      "Nama Ayah", "Tahun Lahir Ayah", "Pendidikan Ayah", "Pekerjaan Ayah", "Penghasilan Ayah", "NIK Ayah",
+      // Data Ibu
+      "Nama Ibu", "Tahun Lahir Ibu", "Pendidikan Ibu", "Pekerjaan Ibu", "Penghasilan Ibu", "NIK Ibu",
+      // Data Wali
+      "Nama Wali", "Tahun Lahir Wali", "Pendidikan Wali", "Pekerjaan Wali", "Penghasilan Wali", "NIK Wali",
+      // Data Tambahan
+      "No. KK", "Anak ke-", "Jml Saudara Kandung", "Sekolah Asal", "No. Registrasi Akta Lahir", "Nomor KIP", "Nama di KIP", "Nomor KKS/PKH", "Berat Badan (kg)", "Tinggi Badan (cm)", "Lingkar Kepala (cm)",
+      // Meta Data
+      "Tanggal Dibuat"
+    ];
 
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    // 2. Map student data to match the header order
+    const dataToExport = students.map(s => ([
+      s.fullName, s.gender, s.nisn ?? '', s.kelas ?? '', s.birthPlace ?? '', s.birthDate ? format(new Date(s.birthDate), 'dd-MM-yyyy') : '', s.nik ?? '', s.religion,
+      s.address ?? '', s.rt ?? '', s.rw ?? '', s.dusun ?? '', s.kelurahan ?? '', s.kecamatan ?? '', s.postalCode ?? '',
+      s.residenceType, s.transportMode, s.phone ?? '', s.mobilePhone,
+      s.fatherName, s.fatherBirthYear ?? '', s.fatherEducation ?? '', s.fatherOccupation ?? '', s.fatherIncome ?? '', s.fatherNik ?? '',
+      s.motherName, s.motherBirthYear ?? '', s.motherEducation ?? '', s.motherOccupation ?? '', s.motherIncome ?? '', s.motherNik ?? '',
+      s.guardianName ?? '', s.guardianBirthYear ?? '', s.guardianEducation ?? '', s.guardianOccupation ?? '', s.guardianIncome ?? '', s.guardianNik ?? '',
+      s.kkNumber ?? '', s.childOrder ?? '', s.siblingsCount ?? '', s.previousSchool ?? '', s.birthCertificateRegNo ?? '', s.kipNumber ?? '', s.kipName ?? '', s.kksPkhNumber ?? '', s.weight ?? '', s.height ?? '', s.headCircumference ?? '',
+      s.createdAt ? format(new Date(s.createdAt), 'dd-MM-yyyy HH:mm:ss') : ''
+    ]));
+    
+    // 3. Create worksheet with title, date, and data
     const workbook = XLSX.utils.book_new();
+    const finalData = [
+      ["Laporan Data Siswa - Student Data Entry"],
+      [`Tanggal Ekspor: ${format(new Date(), "dd MMMM yyyy HH:mm", { locale: id })}`],
+      [], // Blank row for spacing
+      headers,
+      ...dataToExport
+    ];
+    
+    const worksheet = XLSX.utils.aoa_to_sheet(finalData);
+
+    // 4. Set column widths and formatting
+    const colWidths = headers.map(header => ({ wch: header.length > 20 ? 30 : header.length + 5 }));
+    worksheet['!cols'] = colWidths;
+    
+    // Merge title cell
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }];
+    worksheet['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } });
+    
+    // Ensure number-like fields are treated as text by iterating through cells
+    for (let R = 4; R < finalData.length; ++R) {
+        // NISN, NIK, Phone numbers etc.
+        const textFormatCells = [2, 6, 9, 10, 14, 17, 18, 24, 29, 35, 36, 37, 40, 41, 42, 43, 44];
+        textFormatCells.forEach(C => {
+            const cellAddress = XLSX.utils.encode_cell({r:R, c:C});
+            if (worksheet[cellAddress]) {
+                worksheet[cellAddress].t = 's'; // 's' forces the cell type to string
+            }
+        });
+    }
+
     XLSX.utils.book_append_sheet(workbook, worksheet, "DataSiswa");
     
-    XLSX.writeFile(workbook, "Data_Siswa.xlsx", { bookType: 'xlsx', type: 'buffer' });
+    // 5. Trigger download
+    XLSX.writeFile(workbook, "Data_Siswa_Lengkap.xlsx", { bookType: 'xlsx', type: 'buffer' });
+    
+    toast({
+        title: "Ekspor Berhasil",
+        description: "Data siswa telah berhasil diekspor ke file Excel.",
+    });
   };
 
 
