@@ -48,56 +48,56 @@ interface StudentFormProps {
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Nama lengkap wajib diisi." }),
   gender: z.string({ required_error: "Jenis kelamin wajib dipilih." }),
-  nisn: z.string().optional(),
+  nisn: z.string().min(1, { message: "NISN wajib diisi." }).regex(/^[0-9]+$/, { message: "NISN hanya boleh berisi angka." }),
   kelas: z.string().optional(),
   birthPlace: z.string().optional(),
   birthDate: z.date().optional(),
-  nik: z.string().optional(),
+  nik: z.string().regex(/^[0-9]*$/, { message: "NIK hanya boleh berisi angka." }).optional().or(z.literal('')),
   religion: z.string({ required_error: "Agama wajib dipilih." }),
   address: z.string().optional(),
-  rt: z.string().optional(),
-  rw: z.string().optional(),
+  rt: z.string().regex(/^[0-9]*$/, { message: "RT hanya boleh berisi angka." }).optional().or(z.literal('')),
+  rw: z.string().regex(/^[0-9]*$/, { message: "RW hanya boleh berisi angka." }).optional().or(z.literal('')),
   dusun: z.string().optional(),
   kelurahan: z.string().optional(),
   kecamatan: z.string().optional(),
-  postalCode: z.string().optional(),
+  postalCode: z.string().regex(/^[0-9]*$/, { message: "Kode Pos hanya boleh berisi angka." }).optional().or(z.literal('')),
   residenceType: z.string({ required_error: "Jenis tinggal wajib dipilih." }),
   transportMode: z.string({ required_error: "Alat transportasi wajib dipilih." }),
-  phone: z.string().optional(),
-  mobilePhone: z.string().min(1, { message: "Nomor HP wajib diisi." }),
+  phone: z.string().regex(/^[0-9]*$/, { message: "Telepon hanya boleh berisi angka." }).optional().or(z.literal('')),
+  mobilePhone: z.string().min(1, { message: "Nomor HP wajib diisi." }).regex(/^[0-9]+$/, { message: "Nomor HP hanya boleh berisi angka." }),
 
   fatherName: z.string().min(1, { message: "Nama Ayah wajib diisi." }),
-  fatherBirthYear: z.string().optional(),
+  fatherBirthYear: z.string().regex(/^[0-9]*$/, { message: "Tahun Lahir Ayah hanya boleh berisi angka." }).optional().or(z.literal('')),
   fatherEducation: z.string().optional(),
   fatherOccupation: z.string().optional(),
   fatherIncome: z.string().optional(),
-  fatherNik: z.string().optional(),
+  fatherNik: z.string().regex(/^[0-9]*$/, { message: "NIK Ayah hanya boleh berisi angka." }).optional().or(z.literal('')),
 
   motherName: z.string().min(1, { message: "Nama Ibu wajib diisi." }),
-  motherBirthYear: z.string().optional(),
+  motherBirthYear: z.string().regex(/^[0-9]*$/, { message: "Tahun Lahir Ibu hanya boleh berisi angka." }).optional().or(z.literal('')),
   motherEducation: z.string().optional(),
   motherOccupation: z.string().optional(),
   motherIncome: z.string().optional(),
-  motherNik: z.string().optional(),
+  motherNik: z.string().regex(/^[0-9]*$/, { message: "NIK Ibu hanya boleh berisi angka." }).optional().or(z.literal('')),
 
   guardianName: z.string().optional(),
-  guardianBirthYear: z.string().optional(),
+  guardianBirthYear: z.string().regex(/^[0-9]*$/, { message: "Tahun Lahir Wali hanya boleh berisi angka." }).optional().or(z.literal('')),
   guardianEducation: z.string().optional(),
   guardianOccupation: z.string().optional(),
   guardianIncome: z.string().optional(),
-  guardianNik: z.string().optional(),
+  guardianNik: z.string().regex(/^[0-9]*$/, { message: "NIK Wali hanya boleh berisi angka." }).optional().or(z.literal('')),
 
   kipNumber: z.string().optional(),
   kipName: z.string().optional(),
   kksPkhNumber: z.string().optional(),
   birthCertificateRegNo: z.string().optional(),
   previousSchool: z.string().optional(),
-  childOrder: z.string().optional(),
-  kkNumber: z.string().optional(),
-  weight: z.string().optional(),
-  height: z.string().optional(),
-  headCircumference: z.string().optional(),
-  siblingsCount: z.string().optional(),
+  childOrder: z.string().regex(/^[0-9]*$/, { message: "Anak ke-berapa hanya boleh berisi angka." }).optional().or(z.literal('')),
+  kkNumber: z.string().regex(/^[0-9]*$/, { message: "No KK hanya boleh berisi angka." }).optional().or(z.literal('')),
+  weight: z.string().regex(/^[0-9.]*$/, { message: "Berat Badan hanya boleh berisi angka." }).optional().or(z.literal('')),
+  height: z.string().regex(/^[0-9.]*$/, { message: "Tinggi Badan hanya boleh berisi angka." }).optional().or(z.literal('')),
+  headCircumference: z.string().regex(/^[0-9.]*$/, { message: "Lingkar Kepala hanya boleh berisi angka." }).optional().or(z.literal('')),
+  siblingsCount: z.string().regex(/^[0-9]*$/, { message: "Jumlah Saudara Kandung hanya boleh berisi angka." }).optional().or(z.literal('')),
 });
 
 const religionOptions = ["Islam", "Kristen", "Katolik", "Hindu", "Buddha", "Konghucu", "Lainnya"];
@@ -415,7 +415,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                   <FormItem>
                     <FormLabel>RT</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="001" {...field} />
+                      <Input type="text" placeholder="001" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -428,7 +428,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                   <FormItem>
                     <FormLabel>RW</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="001" {...field} />
+                      <Input type="text" placeholder="001" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -597,7 +597,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                         <FormItem>
                           <FormLabel>Tahun Lahir Ayah</FormLabel>
                           <FormControl>
-                            <Input type="number" placeholder="Contoh: 1970" {...field} />
+                            <Input type="text" placeholder="Contoh: 1970" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -700,7 +700,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                         <FormItem>
                           <FormLabel>Tahun Lahir Ibu</FormLabel>
                           <FormControl>
-                            <Input type="number" placeholder="Contoh: 1972" {...field} />
+                            <Input type="text" placeholder="Contoh: 1972" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -803,7 +803,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                         <FormItem>
                           <FormLabel>Tahun Lahir Wali</FormLabel>
                           <FormControl>
-                            <Input type="number" placeholder="Contoh: 1965" {...field} />
+                            <Input type="text" placeholder="Contoh: 1965" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -978,7 +978,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Anak ke-berapa</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Contoh: 1" {...field} />
+                    <Input type="text" placeholder="Contoh: 1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -991,7 +991,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Jumlah Saudara Kandung</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Contoh: 2" {...field} />
+                    <Input type="text" placeholder="Contoh: 2" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1004,7 +1004,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Berat Badan (kg)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Contoh: 45" {...field} />
+                    <Input type="text" placeholder="Contoh: 45" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1017,7 +1017,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Tinggi Badan (cm)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Contoh: 160" {...field} />
+                    <Input type="text" placeholder="Contoh: 160" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1030,7 +1030,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 <FormItem>
                   <FormLabel>Lingkar Kepala (cm)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Contoh: 55" {...field} />
+                    <Input type="text" placeholder="Contoh: 55" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
