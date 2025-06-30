@@ -64,15 +64,12 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     }
 
     // 1. Define styles
-    const titleStyle = { font: { sz: 16, bold: true }, alignment: { horizontal: 'center', vertical: 'center' } };
+    const thinBorder = { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } };
+    const titleStyle = { font: { sz: 18, bold: true }, alignment: { horizontal: 'center', vertical: 'center' } };
     const subtitleStyle = { font: { bold: true }, alignment: { horizontal: 'center', vertical: 'center' } };
-    const headerStyle = {
-        font: { bold: true },
-        border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
-    };
-    const cellStyle = {
-        border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
-    };
+    const headerStyle = { font: { sz: 14, bold: true }, border: thinBorder, alignment: { horizontal: 'center', vertical: 'center' } };
+    const cellLeftStyle = { border: thinBorder, alignment: { horizontal: 'left', vertical: 'center' } };
+    const cellCenterStyle = { border: thinBorder, alignment: { horizontal: 'center', vertical: 'center' } };
 
     // 2. Define logical column headers
     const headers = [
@@ -121,20 +118,25 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     if(worksheet['A1']) worksheet['A1'].s = titleStyle;
     if(worksheet['A2']) worksheet['A2'].s = subtitleStyle;
 
-    const headerRowIndex = 3; // Headers start at row 4 (index 3)
-    const dataEndIndex = headerRowIndex + dataToExport.length;
+    const headerRowIndex = 3; 
+    const dataStartIndex = headerRowIndex + 1;
+    const dataEndIndex = dataStartIndex + dataToExport.length - 1;
+
+    const textFormatColumnIndices = [2, 6, 9, 10, 14, 17, 18, 20, 24, 26, 30, 32, 36, 37, 38, 39, 41, 42, 44, 45, 46, 47];
+    const centeredColumnIndices = [1, 2, 5, 6, 9, 10, 14, 20, 24, 26, 30, 32, 36, 37, 38, 39, 45, 46, 47, 48];
 
     for (let R = headerRowIndex; R <= dataEndIndex; ++R) {
         for (let C = 0; C < headers.length; ++C) {
             const cellAddress = XLSX.utils.encode_cell({r: R, c: C});
             if (!worksheet[cellAddress]) continue;
 
-            worksheet[cellAddress].s = (R === headerRowIndex) ? headerStyle : cellStyle;
-
-            // Format specific columns as text to preserve leading zeros etc.
-            const textFormatColumnIndices = [2, 6, 9, 10, 14, 17, 18, 20, 24, 26, 30, 32, 36, 37, 38, 39, 41, 42, 44];
-            if (textFormatColumnIndices.includes(C) && R > headerRowIndex) {
-                worksheet[cellAddress].t = 's';
+            if (R === headerRowIndex) {
+                worksheet[cellAddress].s = headerStyle;
+            } else {
+                worksheet[cellAddress].s = centeredColumnIndices.includes(C) ? cellCenterStyle : cellLeftStyle;
+                if (textFormatColumnIndices.includes(C)) {
+                    worksheet[cellAddress].t = 's';
+                }
             }
         }
     }
@@ -145,7 +147,8 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
           const cellLength = cell ? String(cell).length : 0;
           return Math.max(max, cellLength);
       }, 0);
-      return { wch: maxLength + 2 }; // +2 for padding
+      if (i === 0) return { wch: Math.max(maxLength, 25) + 2 }; 
+      return { wch: maxLength + 2 };
     });
     worksheet['!cols'] = colWidths;
 
@@ -162,7 +165,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     // 8. Create workbook and trigger download
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "DataSiswa");
-    XLSX.writeFile(workbook, "Data_Siswa_Lengkap_Styled.xlsx", { bookType: 'xlsx', type: 'buffer' });
+    XLSX.writeFile(workbook, "Data_Siswa_Lengkap.xlsx", { bookType: 'xlsx', type: 'buffer' });
     
     toast({
         title: "Ekspor Berhasil",
