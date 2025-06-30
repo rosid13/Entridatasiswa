@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { collection, query, where, onSnapshot, doc, updateDoc, orderBy, writeBatch, getDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, writeBatch, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { db, auth } from '@/lib/firebase';
@@ -60,12 +60,17 @@ export default function RequestsPage() {
     useEffect(() => {
         if (session?.role !== 'admin') return;
         
-        const q = query(collection(db, "correctionRequests"), where("status", "==", "pending"), orderBy("requestDate", "desc"));
+        const q = query(collection(db, "correctionRequests"), where("status", "==", "pending"));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const requestsData = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             } as CorrectionRequest));
+
+            // Urutkan di sisi klien untuk menghindari kebutuhan indeks komposit.
+            // Untuk aplikasi produksi, disarankan untuk membuat indeks di Firebase.
+            requestsData.sort((a, b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime());
+
             setRequests(requestsData);
             setPageLoading(false);
         }, (error) => {
