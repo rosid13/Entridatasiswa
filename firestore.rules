@@ -1,36 +1,37 @@
+
 rules_version = '2';
 
 service cloud.firestore {
+  function isAdmin() {
+    return request.auth != null && get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.role == 'admin';
+  }
+
   match /databases/{database}/documents {
-
-    function isAdmin() {
-      // Pastikan pengguna terotentikasi sebelum mencoba membaca peran
-      return request.auth != null && get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
     match /siswa/{studentId} {
-      allow read, create: if isAuthenticated();
+      // Create and Read allowed for any authenticated user
+      allow read, create: if request.auth != null;
+      
+      // Update and Delete only allowed for admins
       allow update, delete: if isAdmin();
     }
 
-    match /userRoles/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.resource.data.role == 'user';
-      // Hanya admin yang bisa mengubah peran seseorang
-      allow update: if isAdmin();
-    }
-    
     match /correctionRequests/{requestId} {
-      // Pengguna terotentikasi dapat membuat permintaan
-      allow create: if isAuthenticated();
-      // Hanya admin yang dapat membaca dan memperbarui (untuk menyetujui/menolak)
+      // Users can create requests for themselves
+      allow create: if request.auth != null && request.resource.data.requestedByUserId == request.auth.uid;
+      
+      // Admins can read and update (approve/reject) any request
       allow read, update: if isAdmin();
-      // Hapus tidak diizinkan untuk menjaga jejak audit
-      allow delete: if false;
+    }
+
+    match /userRoles/{userId} {
+      // A user can create their own role document upon first sign-up.
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // A user can read their own role document.
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // An admin can read and write to any user's role document.
+      allow read, write: if isAdmin();
     }
   }
 }

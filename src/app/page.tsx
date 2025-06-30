@@ -42,7 +42,7 @@ export default function Home() {
         } else if (!docSnap.exists()) {
           // Buat dokumen peran untuk pengguna baru
           try {
-            await setDoc(userRoleRef, { role: 'user' });
+            await setDoc(userRoleRef, { role: 'user', email: currentUser.email });
           } catch (error) {
             console.error("Failed to create user role:", error);
             toast({

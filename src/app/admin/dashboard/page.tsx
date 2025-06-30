@@ -13,8 +13,6 @@ import type { AppSession } from '@/app/page';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, Users, FileCheck2, LogOut, UserPlus, List } from 'lucide-react';
 
@@ -23,9 +21,6 @@ export default function AdminDashboardPage() {
     const [pageLoading, setPageLoading] = useState(true);
     const [stats, setStats] = useState({ studentCount: 0, pendingRequestsCount: 0 });
     const [statsLoading, setStatsLoading] = useState(true);
-    
-    const [userIdToAdmin, setUserIdToAdmin] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
     const { toast } = useToast();
@@ -95,21 +90,11 @@ export default function AdminDashboardPage() {
              setStats(prev => ({...prev, studentCount: snap.size}));
         }, (error) => {
             console.error("Real-time student count failed:", error);
-            toast({
-                variant: "destructive",
-                title: "Gagal Update Real-time",
-                description: "Tidak dapat memperbarui jumlah siswa secara real-time.",
-            });
         });
         requestsUnsub = onSnapshot(query(collection(db, "correctionRequests"), where("status", "==", "pending")), (snap) => {
              setStats(prev => ({...prev, pendingRequestsCount: snap.size}));
         }, (error) => {
             console.error("Real-time request count failed:", error);
-            toast({
-                variant: "destructive",
-                title: "Gagal Update Real-time",
-                description: "Tidak dapat memperbarui jumlah permintaan secara real-time.",
-            });
         });
 
         return () => {
@@ -118,26 +103,6 @@ export default function AdminDashboardPage() {
         };
 
     }, [session, toast]);
-
-    const handleSetAdmin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!userIdToAdmin) {
-          toast({ variant: 'destructive', title: 'Gagal!', description: 'User ID tidak boleh kosong.' });
-          return;
-        }
-        setIsSubmitting(true);
-        try {
-          const userRoleRef = doc(db, 'userRoles', userIdToAdmin);
-          await setDoc(userRoleRef, { role: 'admin' }, { merge: true });
-          toast({ title: 'Sukses!', description: `Peran untuk user ${userIdToAdmin} telah diatur menjadi admin.` });
-          setUserIdToAdmin('');
-        } catch (error) {
-          console.error("Error setting user role: ", error);
-          toast({ variant: 'destructive', title: 'Gagal!', description: 'Terjadi kesalahan saat mengatur peran user.' });
-        } finally {
-          setIsSubmitting(false);
-        }
-    };
     
     const handleLogout = async () => {
         try {
@@ -204,41 +169,22 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Navigation and Admin Actions */}
-                <div className="grid gap-8 md:grid-cols-2">
+                <div>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Navigasi Cepat</CardTitle>
+                            <CardTitle>Manajemen & Navigasi</CardTitle>
                             <CardDescription>Akses cepat ke halaman manajemen utama.</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="grid md:grid-cols-3 gap-4">
                             <Link href="/" passHref>
-                                <Button className="w-full" variant="outline"><List className="mr-2 h-4 w-4"/> Lihat & Kelola Data Siswa</Button>
+                                <Button className="w-full" variant="outline"><List className="mr-2 h-4 w-4"/> Kelola Data Siswa</Button>
                             </Link>
-                             <Link href="/requests" passHref>
-                                <Button className="w-full"><FileCheck2 className="mr-2 h-4 w-4"/> Tinjau Permintaan Perbaikan</Button>
+                            <Link href="/requests" passHref>
+                                <Button className="w-full"><FileCheck2 className="mr-2 h-4 w-4"/> Tinjau Permintaan</Button>
                             </Link>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Panel Admin</CardTitle>
-                            <CardDescription>Atur peran pengguna secara manual.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                             <form onSubmit={handleSetAdmin} className="space-y-4">
-                                <Label htmlFor="userId" className='font-semibold'>Jadikan Admin</Label>
-                                <Input
-                                    id="userId"
-                                    type="text"
-                                    value={userIdToAdmin}
-                                    onChange={(e) => setUserIdToAdmin(e.target.value)}
-                                    placeholder="Masukkan User ID dari Firebase Auth"
-                                />
-                                <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-                                    Atur Sebagai Admin
-                                </Button>
-                            </form>
+                            <Link href="/admin/users" passHref>
+                                <Button className="w-full" ><UserPlus className="mr-2 h-4 w-4"/> Manajemen Pengguna</Button>
+                            </Link>
                         </CardContent>
                     </Card>
                 </div>
