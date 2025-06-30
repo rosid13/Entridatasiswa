@@ -118,8 +118,8 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     const worksheet = XLSX.utils.aoa_to_sheet(finalData);
 
     // 5. Apply styling, formatting, and auto-fit columns
-    worksheet['A1'].s = titleStyle;
-    worksheet['A2'].s = subtitleStyle;
+    if(worksheet['A1']) worksheet['A1'].s = titleStyle;
+    if(worksheet['A2']) worksheet['A2'].s = subtitleStyle;
 
     const headerRowIndex = 3; // Headers start at row 4 (index 3)
     const dataEndIndex = headerRowIndex + dataToExport.length;
@@ -131,6 +131,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
 
             worksheet[cellAddress].s = (R === headerRowIndex) ? headerStyle : cellStyle;
 
+            // Format specific columns as text to preserve leading zeros etc.
             const textFormatColumnIndices = [2, 6, 9, 10, 14, 17, 18, 20, 24, 26, 30, 32, 36, 37, 38, 39, 41, 42, 44];
             if (textFormatColumnIndices.includes(C) && R > headerRowIndex) {
                 worksheet[cellAddress].t = 's';
