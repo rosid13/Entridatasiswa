@@ -1,9 +1,13 @@
 "use client";
 
 import { useState, useRef } from 'react';
+import { doc, deleteDoc } from 'firebase/firestore';
 import StudentForm from '@/components/student-form';
 import StudentList from '@/components/student-list';
 import StudentDetailModal from '@/components/student-detail-modal';
+import { db } from '@/lib/firebase';
+import { useToast } from '@/hooks/use-toast';
+
 
 interface Student {
     id: string;
@@ -61,6 +65,7 @@ export default function Home() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const handleStudentClick = (student: Student) => {
     setSelectedStudent(student);
@@ -88,6 +93,26 @@ export default function Home() {
     setEditingStudent(null);
   }
 
+  const handleDelete = async (studentId: string) => {
+    if (!selectedStudent) return;
+    try {
+      const studentRef = doc(db, "siswa", studentId);
+      await deleteDoc(studentRef);
+      toast({
+        title: "Sukses!",
+        description: "Data siswa berhasil dihapus.",
+      });
+      setSelectedStudent(null);
+    } catch (error) {
+       console.error("Error deleting document: ", error);
+       toast({
+        variant: "destructive",
+        title: "Gagal!",
+        description: "Terjadi kesalahan saat menghapus data.",
+      });
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background p-4 sm:p-6 md:p-8">
       <div className="max-w-5xl mx-auto">
@@ -109,6 +134,7 @@ export default function Home() {
         isOpen={!!selectedStudent}
         onClose={handleCloseModal}
         onEdit={handleStartEdit}
+        onDelete={handleDelete}
       />
     </main>
   );
