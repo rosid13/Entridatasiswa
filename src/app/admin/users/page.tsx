@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowLeft, UserPlus } from 'lucide-react';
+import Footer from '@/components/footer';
 
 interface ManagedUser {
     id: string;
@@ -171,132 +172,135 @@ export default function UserManagementPage() {
     }
     
     return (
-        <main className="min-h-screen bg-secondary p-4 sm:p-6 md:p-8">
-            <div className="max-w-7xl mx-auto space-y-8">
-                <header className="flex items-center gap-4">
-                    <Link href="/admin/dashboard" passHref>
-                        <Button variant="outline" size="icon">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-foreground">Manajemen Pengguna</h1>
-                        <p className="text-muted-foreground mt-2">Daftarkan pengguna baru dan kelola peran mereka.</p>
-                    </div>
-                </header>
+        <div className="flex flex-col min-h-screen bg-secondary">
+            <main className="flex-grow p-4 sm:p-6 md:p-8">
+                <div className="max-w-7xl mx-auto space-y-8">
+                    <header className="flex items-center gap-4">
+                        <Link href="/admin/dashboard" passHref>
+                            <Button variant="outline" size="icon">
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-bold text-foreground">Manajemen Pengguna</h1>
+                            <p className="text-muted-foreground mt-2">Daftarkan pengguna baru dan kelola peran mereka.</p>
+                        </div>
+                    </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-1">
-                        <Card>
-                             <CardHeader>
-                                <CardTitle>Daftarkan Pengguna Baru</CardTitle>
-                                <CardDescription>Buat akun baru untuk pengguna.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(onRegisterSubmit)} className="space-y-6">
-                                        <FormField
-                                            control={form.control}
-                                            name="email"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Email Pengguna</FormLabel>
-                                                    <FormControl>
-                                                    <Input type="email" placeholder="email@contoh.com" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="password"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Password</FormLabel>
-                                                    <FormControl>
-                                                    <Input type="password" placeholder="••••••••" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <Button type="submit" className="w-full" disabled={isRegistering}>
-                                            {isRegistering ? (
-                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Mendaftarkan...</>
-                                            ) : (
-                                                <><UserPlus className="mr-2 h-4 w-4" /> Daftarkan Pengguna</>
-                                            )}
-                                        </Button>
-                                    </form>
-                                </Form>
-                            </CardContent>
-                        </Card>
-                    </div>
-                    <div className="lg:col-span-2">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Daftar Pengguna</CardTitle>
-                                <CardDescription>
-                                    Berikut adalah daftar semua pengguna yang terdaftar di sistem.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {usersLoading ? (
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-12 w-full" />
-                                        <Skeleton className="h-12 w-full" />
-                                        <Skeleton className="h-12 w-full" />
-                                    </div>
-                                ) : users.length > 0 ? (
-                                    <div className="border rounded-md">
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Email</TableHead>
-                                                    <TableHead>Peran</TableHead>
-                                                    <TableHead className="text-right">Aksi</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {users.map((user) => (
-                                                    <TableRow key={user.id}>
-                                                        <TableCell className="font-medium break-all">{user.email}</TableCell>
-                                                        <TableCell>
-                                                            <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                                                                {user.role}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <Select
-                                                                value={user.role}
-                                                                onValueChange={(value: 'user' | 'admin') => handleRoleChange(user.id, value)}
-                                                                disabled={user.id === session?.user.uid}
-                                                            >
-                                                                <SelectTrigger className="w-[120px]">
-                                                                    <SelectValue placeholder="Ubah Peran" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="user">User</SelectItem>
-                                                                    <SelectItem value="admin">Admin</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </TableCell>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-1">
+                            <Card>
+                                 <CardHeader>
+                                    <CardTitle>Daftarkan Pengguna Baru</CardTitle>
+                                    <CardDescription>Buat akun baru untuk pengguna.</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <Form {...form}>
+                                        <form onSubmit={form.handleSubmit(onRegisterSubmit)} className="space-y-6">
+                                            <FormField
+                                                control={form.control}
+                                                name="email"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Email Pengguna</FormLabel>
+                                                        <FormControl>
+                                                        <Input type="email" placeholder="email@contoh.com" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="password"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Password</FormLabel>
+                                                        <FormControl>
+                                                        <Input type="password" placeholder="••••••••" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <Button type="submit" className="w-full" disabled={isRegistering}>
+                                                {isRegistering ? (
+                                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Mendaftarkan...</>
+                                                ) : (
+                                                    <><UserPlus className="mr-2 h-4 w-4" /> Daftarkan Pengguna</>
+                                                )}
+                                            </Button>
+                                        </form>
+                                    </Form>
+                                </CardContent>
+                            </Card>
+                        </div>
+                        <div className="lg:col-span-2">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Daftar Pengguna</CardTitle>
+                                    <CardDescription>
+                                        Berikut adalah daftar semua pengguna yang terdaftar di sistem.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    {usersLoading ? (
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-12 w-full" />
+                                            <Skeleton className="h-12 w-full" />
+                                            <Skeleton className="h-12 w-full" />
+                                        </div>
+                                    ) : users.length > 0 ? (
+                                        <div className="border rounded-md">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>Email</TableHead>
+                                                        <TableHead>Peran</TableHead>
+                                                        <TableHead className="text-right">Aksi</TableHead>
                                                     </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
-                                ) : (
-                                    <p className="text-center text-muted-foreground py-8">
-                                        Tidak ada pengguna yang terdaftar.
-                                    </p>
-                                )}
-                            </CardContent>
-                        </Card>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {users.map((user) => (
+                                                        <TableRow key={user.id}>
+                                                            <TableCell className="font-medium break-all">{user.email}</TableCell>
+                                                            <TableCell>
+                                                                <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                                                                    {user.role}
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                <Select
+                                                                    value={user.role}
+                                                                    onValueChange={(value: 'user' | 'admin') => handleRoleChange(user.id, value)}
+                                                                    disabled={user.id === session?.user.uid}
+                                                                >
+                                                                    <SelectTrigger className="w-[120px]">
+                                                                        <SelectValue placeholder="Ubah Peran" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="user">User</SelectItem>
+                                                                        <SelectItem value="admin">Admin</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-muted-foreground py-8">
+                                            Tidak ada pengguna yang terdaftar.
+                                        </p>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
+            <Footer />
+        </div>
     );
 }

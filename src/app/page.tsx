@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { Student } from '@/types/student';
 import { Button } from '@/components/ui/button';
 import { Loader2, LogOut, LayoutDashboard } from 'lucide-react';
+import Footer from '@/components/footer';
 
 export interface AppSession {
   user: User;
@@ -149,45 +150,48 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-secondary p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center mb-10">
-            <div className='text-left'>
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground">Manajemen Data Siswa</h1>
-                <p className="text-muted-foreground mt-3 max-w-2xl">Platform terpusat untuk mengelola informasi siswa secara efisien, modern, dan aman.</p>
-            </div>
-            <div className="flex items-center gap-2">
-                {session.role === 'admin' && (
-                  <Link href="/admin/dashboard" passHref>
-                      <Button variant="outline">
-                          <LayoutDashboard className="mr-2 h-4 w-4" />
-                          Dashboard
-                      </Button>
-                  </Link>
-                )}
-                <Button variant="outline" onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                </Button>
-            </div>
-        </header>
-        <div ref={formRef}>
-          <StudentForm 
-            studentToEdit={editingStudent} 
-            onSuccess={handleSuccess}
-            onCancel={handleCancelEdit}
-          />
+    <div className="flex flex-col min-h-screen bg-secondary">
+      <main className="flex-grow p-4 sm:p-6 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <header className="flex justify-between items-center mb-10">
+              <div className='text-left'>
+                  <h1 className="text-4xl md:text-5xl font-bold text-foreground">Manajemen Data Siswa</h1>
+                  <p className="text-muted-foreground mt-3 max-w-2xl">Platform terpusat untuk mengelola informasi siswa secara efisien, modern, dan aman.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                  {session.role === 'admin' && (
+                    <Link href="/admin/dashboard" passHref>
+                        <Button variant="outline">
+                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                            Dashboard
+                        </Button>
+                    </Link>
+                  )}
+                  <Button variant="outline" onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                  </Button>
+              </div>
+          </header>
+          <div ref={formRef}>
+            <StudentForm 
+              studentToEdit={editingStudent} 
+              onSuccess={handleSuccess}
+              onCancel={handleCancelEdit}
+            />
+          </div>
+          <StudentList onStudentClick={handleStudentClick} key={listKey} />
         </div>
-        <StudentList onStudentClick={handleStudentClick} key={listKey} />
-      </div>
-       <StudentDetailModal
-        student={selectedStudent}
-        isOpen={!!selectedStudent}
-        onClose={handleCloseModal}
-        onEdit={handleStartEdit}
-        onDelete={handleDelete}
-        userSession={session}
-      />
-    </main>
+         <StudentDetailModal
+          student={selectedStudent}
+          isOpen={!!selectedStudent}
+          onClose={handleCloseModal}
+          onEdit={handleStartEdit}
+          onDelete={handleDelete}
+          userSession={session}
+        />
+      </main>
+      <Footer />
+    </div>
   );
 }

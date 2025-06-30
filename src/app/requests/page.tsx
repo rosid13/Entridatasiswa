@@ -22,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Footer from '@/components/footer';
 
 export default function RequestsPage() {
     const [requests, setRequests] = useState<CorrectionRequest[]>([]);
@@ -141,118 +142,121 @@ export default function RequestsPage() {
     }
     
     return (
-        <main className="min-h-screen bg-secondary p-4 sm:p-6 md:p-8">
-            <div className="max-w-7xl mx-auto">
-                <header className="flex items-center gap-4 mb-10">
-                    <Link href="/admin/dashboard" passHref>
-                        <Button variant="outline" size="icon">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-foreground">Permintaan Perbaikan</h1>
-                        <p className="text-muted-foreground mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
-                    </div>
-                </header>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Daftar Permintaan Tertunda</CardTitle>
-                        <CardDescription>
-                            Berikut adalah daftar permintaan perbaikan data yang memerlukan tinjauan Anda.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {requests.length > 0 ? (
-                            <div className="border rounded-md">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Nama Siswa</TableHead>
-                                            <TableHead>Bidang</TableHead>
-                                            <TableHead>Diajukan Oleh</TableHead>
-                                            <TableHead>Tanggal</TableHead>
-                                            <TableHead className="text-right">Aksi</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {requests.map((req) => (
-                                            <TableRow key={req.id}>
-                                                <TableCell className="font-medium">{req.studentName}</TableCell>
-                                                <TableCell><Badge variant="secondary">{req.fieldToCorrect}</Badge></TableCell>
-                                                <TableCell>{req.requestedByUserName}</TableCell>
-                                                <TableCell>{formatDate(req.requestDate)}</TableCell>
-                                                <TableCell className="text-right">
-                                                    <Button variant="outline" size="sm" onClick={() => setSelectedRequest(req)}>
-                                                        Lihat Detail
-                                                    </Button>
-                                                </TableCell>
+        <div className="flex flex-col min-h-screen bg-secondary">
+            <main className="flex-grow p-4 sm:p-6 md:p-8">
+                <div className="max-w-7xl mx-auto">
+                    <header className="flex items-center gap-4 mb-10">
+                        <Link href="/admin/dashboard" passHref>
+                            <Button variant="outline" size="icon">
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-bold text-foreground">Permintaan Perbaikan</h1>
+                            <p className="text-muted-foreground mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
+                        </div>
+                    </header>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Daftar Permintaan Tertunda</CardTitle>
+                            <CardDescription>
+                                Berikut adalah daftar permintaan perbaikan data yang memerlukan tinjauan Anda.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {requests.length > 0 ? (
+                                <div className="border rounded-md">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Nama Siswa</TableHead>
+                                                <TableHead>Bidang</TableHead>
+                                                <TableHead>Diajukan Oleh</TableHead>
+                                                <TableHead>Tanggal</TableHead>
+                                                <TableHead className="text-right">Aksi</TableHead>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        ) : (
-                            <p className="text-center text-muted-foreground py-8">
-                                Tidak ada permintaan perbaikan yang tertunda.
-                            </p>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-
-            {selectedRequest && (
-                <Dialog open={!!selectedRequest} onOpenChange={(open) => !open && setSelectedRequest(null)}>
-                    <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                            <DialogTitle>Detail Permintaan Perbaikan</DialogTitle>
-                            <DialogDescription>
-                                Tinjau detail permintaan untuk siswa <strong>{selectedRequest.studentName}</strong>.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <ScrollArea className="max-h-[60vh] pr-4">
-                            <div className="space-y-4 py-4 text-sm">
-                                <div className="grid grid-cols-[150px_1fr] items-start gap-4">
-                                    <span className="text-muted-foreground">Nama Siswa</span>
-                                    <span className="font-medium">{selectedRequest.studentName}</span>
-
-                                    <span className="text-muted-foreground">Diajukan Oleh</span>
-                                    <span className="font-medium">{selectedRequest.requestedByUserName}</span>
-
-                                    <span className="text-muted-foreground">Tanggal</span>
-                                    <span className="font-medium">{formatDate(selectedRequest.requestDate)}</span>
-
-                                    <span className="text-muted-foreground">Bidang Data</span>
-                                    <span className="font-medium"><Badge variant="outline">{selectedRequest.fieldToCorrect}</Badge></span>
-                                    
-                                    <span className="text-muted-foreground">Nilai Lama</span>
-                                    <div className="font-mono p-2 bg-muted rounded-md break-all">{String(selectedRequest.oldValue ?? 'Kosong')}</div>
-                                    
-                                    <span className="text-muted-foreground">Nilai Baru</span>
-                                    <div className="font-mono p-2 bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-800 rounded-md break-all">{String(selectedRequest.newValue ?? 'Kosong')}</div>
-                                    
-                                    <span className="text-muted-foreground">Alasan</span>
-                                    <p className="p-2 bg-muted rounded-md break-words whitespace-pre-wrap">{selectedRequest.notes}</p>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {requests.map((req) => (
+                                                <TableRow key={req.id}>
+                                                    <TableCell className="font-medium">{req.studentName}</TableCell>
+                                                    <TableCell><Badge variant="secondary">{req.fieldToCorrect}</Badge></TableCell>
+                                                    <TableCell>{req.requestedByUserName}</TableCell>
+                                                    <TableCell>{formatDate(req.requestDate)}</TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Button variant="outline" size="sm" onClick={() => setSelectedRequest(req)}>
+                                                            Lihat Detail
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
                                 </div>
-                            </div>
-                        </ScrollArea>
-                        <DialogFooter className="border-t pt-4 sm:justify-between">
-                            <DialogClose asChild>
-                                <Button variant="outline" disabled={isSubmitting}>Batal</Button>
-                            </DialogClose>
-                            <div className='flex gap-2'>
-                                <Button variant="destructive" onClick={() => handleAction('reject')} disabled={isSubmitting}>
-                                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <XCircle className="mr-2 h-4 w-4" />}
-                                    Tolak
-                                </Button>
-                                <Button onClick={() => handleAction('approve')} disabled={isSubmitting}>
-                                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-                                    Setujui
-                                </Button>
-                            </div>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-            )}
-        </main>
+                            ) : (
+                                <p className="text-center text-muted-foreground py-8">
+                                    Tidak ada permintaan perbaikan yang tertunda.
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {selectedRequest && (
+                    <Dialog open={!!selectedRequest} onOpenChange={(open) => !open && setSelectedRequest(null)}>
+                        <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                                <DialogTitle>Detail Permintaan Perbaikan</DialogTitle>
+                                <DialogDescription>
+                                    Tinjau detail permintaan untuk siswa <strong>{selectedRequest.studentName}</strong>.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <ScrollArea className="max-h-[60vh] pr-4">
+                                <div className="space-y-4 py-4 text-sm">
+                                    <div className="grid grid-cols-[150px_1fr] items-start gap-4">
+                                        <span className="text-muted-foreground">Nama Siswa</span>
+                                        <span className="font-medium">{selectedRequest.studentName}</span>
+
+                                        <span className="text-muted-foreground">Diajukan Oleh</span>
+                                        <span className="font-medium">{selectedRequest.requestedByUserName}</span>
+
+                                        <span className="text-muted-foreground">Tanggal</span>
+                                        <span className="font-medium">{formatDate(selectedRequest.requestDate)}</span>
+
+                                        <span className="text-muted-foreground">Bidang Data</span>
+                                        <span className="font-medium"><Badge variant="outline">{selectedRequest.fieldToCorrect}</Badge></span>
+                                        
+                                        <span className="text-muted-foreground">Nilai Lama</span>
+                                        <div className="font-mono p-2 bg-muted rounded-md break-all">{String(selectedRequest.oldValue ?? 'Kosong')}</div>
+                                        
+                                        <span className="text-muted-foreground">Nilai Baru</span>
+                                        <div className="font-mono p-2 bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-800 rounded-md break-all">{String(selectedRequest.newValue ?? 'Kosong')}</div>
+                                        
+                                        <span className="text-muted-foreground">Alasan</span>
+                                        <p className="p-2 bg-muted rounded-md break-words whitespace-pre-wrap">{selectedRequest.notes}</p>
+                                    </div>
+                                </div>
+                            </ScrollArea>
+                            <DialogFooter className="border-t pt-4 sm:justify-between">
+                                <DialogClose asChild>
+                                    <Button variant="outline" disabled={isSubmitting}>Batal</Button>
+                                </DialogClose>
+                                <div className='flex gap-2'>
+                                    <Button variant="destructive" onClick={() => handleAction('reject')} disabled={isSubmitting}>
+                                        {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <XCircle className="mr-2 h-4 w-4" />}
+                                        Tolak
+                                    </Button>
+                                    <Button onClick={() => handleAction('approve')} disabled={isSubmitting}>
+                                        {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
+                                        Setujui
+                                    </Button>
+                                </div>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                )}
+            </main>
+            <Footer />
+        </div>
     );
 }

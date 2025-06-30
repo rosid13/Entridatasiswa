@@ -85,7 +85,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-secondary p-4">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-secondary p-4">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
+          SMP SUNAN AL-ANBIYA TAMAN
+        </h1>
+        <p className="mt-2 text-muted-foreground">
+          Sistem Manajemen Data Siswa
+        </p>
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Login</CardTitle>
