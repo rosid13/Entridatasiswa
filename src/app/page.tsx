@@ -83,7 +83,7 @@ export default function Home() {
   }
 
   const handleDelete = async (studentId: string) => {
-    if (!selectedStudent) return;
+    if (!selectedStudent || session?.role !== 'admin') return;
     try {
       const studentRef = doc(db, "siswa", studentId);
       await deleteDoc(studentRef);
@@ -97,7 +97,7 @@ export default function Home() {
        toast({
         variant: "destructive",
         title: "Gagal!",
-        description: "Terjadi kesalahan saat menghapus data.",
+        description: "Terjadi kesalahan saat menghapus data. Anda mungkin tidak memiliki izin.",
       });
     }
   };
@@ -161,6 +161,7 @@ export default function Home() {
         onClose={handleCloseModal}
         onEdit={handleStartEdit}
         onDelete={handleDelete}
+        userRole={session.role}
       />
     </main>
   );

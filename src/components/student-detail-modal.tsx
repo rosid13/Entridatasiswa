@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter
 } from "@/components/ui/dialog";
 import {
@@ -25,7 +24,6 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { id } from 'date-fns/locale';
 import type { Student } from '@/types/student';
-import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
 
 interface StudentDetailModalProps {
@@ -34,6 +32,7 @@ interface StudentDetailModalProps {
   onClose: () => void;
   onEdit: (student: Student) => void;
   onDelete: (studentId: string) => void;
+  userRole: string;
 }
 
 const DetailItem = ({ label, value }: { label: string; value?: string | number | null }) => (
@@ -47,7 +46,7 @@ const SectionHeader = ({ children }: { children: React.ReactNode }) => (
   <h3 className="font-semibold text-lg text-foreground mb-2">{children}</h3>
 )
 
-export default function StudentDetailModal({ student, isOpen, onClose, onEdit, onDelete }: StudentDetailModalProps) {
+export default function StudentDetailModal({ student, isOpen, onClose, onEdit, onDelete, userRole }: StudentDetailModalProps) {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   if (!student) return null;
@@ -173,17 +172,21 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
           </ScrollArea>
           <DialogFooter className="pt-4 sm:justify-between w-full border-t">
               <div>
-                <Button variant="destructive" onClick={() => setIsAlertOpen(true)}>
-                    Hapus Data
-                </Button>
+                {userRole === 'admin' && (
+                  <Button variant="destructive" onClick={() => setIsAlertOpen(true)}>
+                      Hapus Data
+                  </Button>
+                )}
               </div>
               <div className='flex gap-2'>
                  <Button variant="outline" onClick={onClose}>
                       Tutup
                   </Button>
-                  <Button onClick={() => onEdit(student)}>
-                      Edit Data
-                  </Button>
+                  {userRole === 'admin' && (
+                    <Button onClick={() => onEdit(student)}>
+                        Edit Data
+                    </Button>
+                  )}
               </div>
           </DialogFooter>
         </DialogContent>
