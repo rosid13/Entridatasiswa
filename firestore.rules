@@ -1,11 +1,7 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    // WARNING: These rules are insecure and allow public access.
-    // They are suitable for development and prototyping but should be
-    // secured with authentication rules before deploying to production.
-    match /siswa/{studentId} {
+    match /{document=**} {
       allow read, write: if true;
     }
   }
