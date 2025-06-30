@@ -88,8 +88,8 @@ export default function LoginPage() {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
             <GraduationCap className="mx-auto h-12 w-12 text-primary mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-            SMP SUNAN AL ANBIYA
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight whitespace-nowrap">
+            SMP SUNAN AL-ANBIYA
             </h1>
             <h2 className="text-2xl sm:text-3xl font-bold text-primary -mt-1">TAMAN</h2>
             <p className="mt-4 text-muted-foreground">
