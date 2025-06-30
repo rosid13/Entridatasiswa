@@ -32,7 +32,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedClass, setSelectedClass] = useState('__all__');
   const [uniqueClasses, setUniqueClasses] = useState<string[]>([]);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
       student.fullName.toLowerCase().includes(searchLower) ||
       (student.nisn && student.nisn.toLowerCase().includes(searchLower));
 
-    const matchesClass = selectedClass ? student.kelas === selectedClass : true;
+    const matchesClass = selectedClass === '__all__' ? true : student.kelas === selectedClass;
 
     return matchesSearch && matchesClass;
   });
@@ -86,7 +86,7 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
               <SelectValue placeholder="Filter Kelas" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Kelas</SelectItem>
+              <SelectItem value="__all__">Semua Kelas</SelectItem>
               {uniqueClasses.map(cls => (
                 <SelectItem key={cls} value={cls}>{cls}</SelectItem>
               ))}
