@@ -13,32 +13,76 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import StudentDetailModal from './student-detail-modal';
 
+// Defines the complete student data structure
 interface Student {
   id: string;
+  createdAt: string;
   fullName: string;
-  nisn: string;
   gender: string;
+  nisn?: string;
+  birthPlace?: string;
+  birthDate?: string; // Stored as ISO string
+  nik?: string;
+  religion: string;
+  address?: string;
+  rt?: string;
+  rw?: string;
+  dusun?: string;
+  kelurahan?: string;
+  kecamatan?: string;
+  postalCode?: string;
+  residenceType: string;
+  transportMode: string;
+  phone?: string;
   mobilePhone: string;
+  fatherName: string;
+  fatherBirthYear?: string;
+  fatherEducation?: string;
+  fatherOccupation?: string;
+  fatherIncome?: string;
+  fatherNik?: string;
+  motherName: string;
+  motherBirthYear?: string;
+  motherEducation?: string;
+  motherOccupation?: string;
+  motherIncome?: string;
+  motherNik?: string;
+  guardianName?: string;
+  guardianBirthYear?: string;
+  guardianEducation?: string;
+  guardianOccupation?: string;
+  guardianIncome?: string;
+  guardianNik?: string;
+  kipNumber?: string;
+  kipName?: string;
+  kksPkhNumber?: string;
+  birthCertificateRegNo?: string;
+  previousSchool?: string;
+  childOrder?: string;
+  kkNumber?: string;
+  weight?: string;
+  height?: string;
+  headCircumference?: string;
+  siblingsCount?: string;
 }
 
 export default function StudentList() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, "siswa"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const studentsData: Student[] = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
+        // Push the full student document data
         studentsData.push({
           id: doc.id,
-          fullName: data.fullName,
-          nisn: data.nisn || '-',
-          gender: data.gender,
-          mobilePhone: data.mobilePhone,
-        });
+          ...doc.data(),
+        } as Student);
       });
       setStudents(studentsData);
       setLoading(false);
@@ -50,45 +94,61 @@ export default function StudentList() {
     return () => unsubscribe();
   }, []);
 
+  const handleRowClick = (student: Student) => {
+    setSelectedStudent(student);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedStudent(null);
+  };
+
   return (
-    <Card className="mt-12">
-      <CardHeader>
-        <CardTitle>Data Siswa Terdaftar</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-           <div className="space-y-2">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-           </div>
-        ) : students.length > 0 ? (
-          <div className="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama Lengkap</TableHead>
-                  <TableHead>NISN</TableHead>
-                  <TableHead>Jenis Kelamin</TableHead>
-                  <TableHead>No. HP</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {students.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium">{student.fullName}</TableCell>
-                    <TableCell>{student.nisn}</TableCell>
-                    <TableCell>{student.gender}</TableCell>
-                    <TableCell>{student.mobilePhone}</TableCell>
+    <>
+      <Card className="mt-12">
+        <CardHeader>
+          <CardTitle>Data Siswa Terdaftar</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+             <div className="space-y-2">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+             </div>
+          ) : students.length > 0 ? (
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nama Lengkap</TableHead>
+                    <TableHead>NISN</TableHead>
+                    <TableHead>Jenis Kelamin</TableHead>
+                    <TableHead>No. HP</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        ) : (
-          <p className="text-center text-muted-foreground">Belum ada data siswa yang terdaftar.</p>
-        )}
-      </CardContent>
-    </Card>
+                </TableHeader>
+                <TableBody>
+                  {students.map((student) => (
+                    <TableRow key={student.id} onClick={() => handleRowClick(student)} className="cursor-pointer">
+                      <TableCell className="font-medium">{student.fullName}</TableCell>
+                      <TableCell>{student.nisn || '-'}</TableCell>
+                      <TableCell>{student.gender}</TableCell>
+                      <TableCell>{student.mobilePhone}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground">Belum ada data siswa yang terdaftar.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <StudentDetailModal
+        student={selectedStudent}
+        isOpen={!!selectedStudent}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 }
