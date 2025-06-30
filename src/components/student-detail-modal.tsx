@@ -24,58 +24,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { id } from 'date-fns/locale';
-
-interface Student {
-    id: string;
-    createdAt: string;
-    fullName: string;
-    gender: string;
-    nisn?: string;
-    birthPlace?: string;
-    birthDate?: string; // ISO string
-    nik?: string;
-    religion: string;
-    address?: string;
-    rt?: string;
-    rw?: string;
-    dusun?: string;
-    kelurahan?: string;
-    kecamatan?: string;
-    postalCode?: string;
-    residenceType: string;
-    transportMode: string;
-    phone?: string;
-    mobilePhone: string;
-    fatherName: string;
-    fatherBirthYear?: string;
-    fatherEducation?: string;
-    fatherOccupation?: string;
-    fatherIncome?: string;
-    fatherNik?: string;
-    motherName: string;
-    motherBirthYear?: string;
-    motherEducation?: string;
-    motherOccupation?: string;
-    motherIncome?: string;
-    motherNik?: string;
-    guardianName?: string;
-    guardianBirthYear?: string;
-    guardianEducation?: string;
-    guardianOccupation?: string;
-    guardianIncome?: string;
-    guardianNik?: string;
-    kipNumber?: string;
-    kipName?: string;
-    kksPkhNumber?: string;
-    birthCertificateRegNo?: string;
-    previousSchool?: string;
-    childOrder?: string;
-    kkNumber?: string;
-    weight?: string;
-    height?: string;
-    headCircumference?: string;
-    siblingsCount?: string;
-}
+import type { Student } from '@/types/student';
 
 interface StudentDetailModalProps {
   student: Student | null;
@@ -130,6 +79,7 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
                   <DetailItem label="Nama Lengkap" value={student.fullName} />
                   <DetailItem label="Jenis Kelamin" value={student.gender} />
                   <DetailItem label="NISN" value={student.nisn} />
+                  <DetailItem label="Kelas" value={student.kelas} />
                   <DetailItem label="NIK" value={student.nik} />
                   <DetailItem label="Tempat Lahir" value={student.birthPlace} />
                   <DetailItem label="Tanggal Lahir" value={formatDate(student.birthDate)} />

@@ -37,58 +37,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
-
-interface Student {
-    id: string;
-    createdAt: string;
-    fullName: string;
-    gender: string;
-    nisn?: string;
-    birthPlace?: string;
-    birthDate?: string; 
-    nik?: string;
-    religion: string;
-    address?: string;
-    rt?: string;
-    rw?: string;
-    dusun?: string;
-    kelurahan?: string;
-    kecamatan?: string;
-    postalCode?: string;
-    residenceType: string;
-    transportMode: string;
-    phone?: string;
-    mobilePhone: string;
-    fatherName: string;
-    fatherBirthYear?: string;
-    fatherEducation?: string;
-    fatherOccupation?: string;
-    fatherIncome?: string;
-    fatherNik?: string;
-    motherName: string;
-    motherBirthYear?: string;
-    motherEducation?: string;
-    motherOccupation?: string;
-    motherIncome?: string;
-    motherNik?: string;
-    guardianName?: string;
-    guardianBirthYear?: string;
-    guardianEducation?: string;
-    guardianOccupation?: string;
-    guardianIncome?: string;
-    guardianNik?: string;
-    kipNumber?: string;
-    kipName?: string;
-    kksPkhNumber?: string;
-    birthCertificateRegNo?: string;
-    previousSchool?: string;
-    childOrder?: string;
-    kkNumber?: string;
-    weight?: string;
-    height?: string;
-    headCircumference?: string;
-    siblingsCount?: string;
-}
+import type { Student } from "@/types/student";
 
 interface StudentFormProps {
   studentToEdit: Student | null;
@@ -100,6 +49,7 @@ const formSchema = z.object({
   fullName: z.string().min(2, { message: "Nama lengkap wajib diisi." }),
   gender: z.string({ required_error: "Jenis kelamin wajib dipilih." }),
   nisn: z.string().optional(),
+  kelas: z.string().optional(),
   birthPlace: z.string().optional(),
   birthDate: z.date().optional(),
   nik: z.string().optional(),
@@ -161,6 +111,7 @@ const defaultFormValues = {
     fullName: "",
     gender: undefined,
     nisn: "",
+    kelas: "",
     birthPlace: "",
     birthDate: undefined,
     nik: "",
@@ -283,7 +234,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
           <CardHeader>
             <CardTitle>Informasi Pribadi</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FormField
               control={form.control}
               name="fullName"
@@ -318,7 +269,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                 </FormItem>
               )}
             />
-            <FormField
+             <FormField
               control={form.control}
               name="nisn"
               render={({ field }) => (
@@ -326,6 +277,19 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
                   <FormLabel>NISN</FormLabel>
                   <FormControl>
                     <Input placeholder="Nomor Induk Siswa Nasional" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="kelas"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kelas</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Contoh: 10A" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -928,7 +892,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
           <CardHeader>
             <CardTitle>Data Tambahan Siswa</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FormField
               control={form.control}
               name="kipNumber"

@@ -13,58 +13,16 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { Student } from '@/types/student';
 
-interface Student {
-  id: string;
-  createdAt: string;
-  fullName: string;
-  gender: string;
-  nisn?: string;
-  birthPlace?: string;
-  birthDate?: string; 
-  nik?: string;
-  religion: string;
-  address?: string;
-  rt?: string;
-  rw?: string;
-  dusun?: string;
-  kelurahan?: string;
-  kecamatan?: string;
-  postalCode?: string;
-  residenceType: string;
-  transportMode: string;
-  phone?: string;
-  mobilePhone: string;
-  fatherName: string;
-  fatherBirthYear?: string;
-  fatherEducation?: string;
-  fatherOccupation?: string;
-  fatherIncome?: string;
-  fatherNik?: string;
-  motherName: string;
-  motherBirthYear?: string;
-  motherEducation?: string;
-  motherOccupation?: string;
-  motherIncome?: string;
-  motherNik?: string;
-  guardianName?: string;
-  guardianBirthYear?: string;
-  guardianEducation?: string;
-  guardianOccupation?: string;
-  guardianIncome?: string;
-  guardianNik?: string;
-  kipNumber?: string;
-  kipName?: string;
-  kksPkhNumber?: string;
-  birthCertificateRegNo?: string;
-  previousSchool?: string;
-  childOrder?: string;
-  kkNumber?: string;
-  weight?: string;
-  height?: string;
-  headCircumference?: string;
-  siblingsCount?: string;
-}
 
 interface StudentListProps {
   onStudentClick: (student: Student) => void;
@@ -73,6 +31,9 @@ interface StudentListProps {
 export default function StudentList({ onStudentClick }: StudentListProps) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedClass, setSelectedClass] = useState('');
+  const [uniqueClasses, setUniqueClasses] = useState<string[]>([]);
 
   useEffect(() => {
     const q = query(collection(db, "siswa"), orderBy("createdAt", "desc"));
@@ -85,6 +46,8 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
         } as Student);
       });
       setStudents(studentsData);
+      const classes = [...new Set(studentsData.map(s => s.kelas).filter(Boolean) as string[])];
+      setUniqueClasses(classes.sort());
       setLoading(false);
     }, (error) => {
       console.error("Error fetching students: ", error);
@@ -94,47 +57,79 @@ export default function StudentList({ onStudentClick }: StudentListProps) {
     return () => unsubscribe();
   }, []);
 
+  const filteredStudents = students.filter(student => {
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch =
+      student.fullName.toLowerCase().includes(searchLower) ||
+      (student.nisn && student.nisn.toLowerCase().includes(searchLower));
+
+    const matchesClass = selectedClass ? student.kelas === selectedClass : true;
+
+    return matchesSearch && matchesClass;
+  });
+
   return (
-    <>
-      <Card className="mt-12">
-        <CardHeader>
-          <CardTitle>Data Siswa Terdaftar</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-             <div className="space-y-2">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-             </div>
-          ) : students.length > 0 ? (
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nama Lengkap</TableHead>
-                    <TableHead>NISN</TableHead>
-                    <TableHead>Jenis Kelamin</TableHead>
-                    <TableHead>No. HP</TableHead>
+    <Card className="mt-12">
+      <CardHeader>
+        <CardTitle>Data Siswa Terdaftar</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <Input
+            placeholder="Cari Nama atau NISN..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-grow"
+          />
+          <Select value={selectedClass} onValueChange={setSelectedClass}>
+            <SelectTrigger className="sm:w-[200px]">
+              <SelectValue placeholder="Filter Kelas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Semua Kelas</SelectItem>
+              {uniqueClasses.map(cls => (
+                <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {loading ? (
+           <div className="space-y-2">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+           </div>
+        ) : filteredStudents.length > 0 ? (
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nama Lengkap</TableHead>
+                  <TableHead>NISN</TableHead>
+                  <TableHead>Kelas</TableHead>
+                  <TableHead>Jenis Kelamin</TableHead>
+                  <TableHead>No. HP</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredStudents.map((student) => (
+                  <TableRow key={student.id} onClick={() => onStudentClick(student)} className="cursor-pointer">
+                    <TableCell className="font-medium">{student.fullName}</TableCell>
+                    <TableCell>{student.nisn || '-'}</TableCell>
+                    <TableCell>{student.kelas || '-'}</TableCell>
+                    <TableCell>{student.gender}</TableCell>
+                    <TableCell>{student.mobilePhone}</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {students.map((student) => (
-                    <TableRow key={student.id} onClick={() => onStudentClick(student)} className="cursor-pointer">
-                      <TableCell className="font-medium">{student.fullName}</TableCell>
-                      <TableCell>{student.nisn || '-'}</TableCell>
-                      <TableCell>{student.gender}</TableCell>
-                      <TableCell>{student.mobilePhone}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground">Belum ada data siswa yang terdaftar.</p>
-          )}
-        </CardContent>
-      </Card>
-    </>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <p className="text-center text-muted-foreground py-8">
+            {students.length > 0 ? 'Tidak ada siswa yang cocok dengan kriteria pencarian.' : 'Belum ada data siswa yang terdaftar.'}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 }

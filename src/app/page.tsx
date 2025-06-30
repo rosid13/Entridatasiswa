@@ -7,59 +7,8 @@ import StudentList from '@/components/student-list';
 import StudentDetailModal from '@/components/student-detail-modal';
 import { db } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
+import type { Student } from '@/types/student';
 
-
-interface Student {
-    id: string;
-    createdAt: string;
-    fullName: string;
-    gender: string;
-    nisn?: string;
-    birthPlace?: string;
-    birthDate?: string; 
-    nik?: string;
-    religion: string;
-    address?: string;
-    rt?: string;
-    rw?: string;
-    dusun?: string;
-    kelurahan?: string;
-    kecamatan?: string;
-    postalCode?: string;
-    residenceType: string;
-    transportMode: string;
-    phone?: string;
-    mobilePhone: string;
-    fatherName: string;
-    fatherBirthYear?: string;
-    fatherEducation?: string;
-    fatherOccupation?: string;
-    fatherIncome?: string;
-    fatherNik?: string;
-    motherName: string;
-    motherBirthYear?: string;
-    motherEducation?: string;
-    motherOccupation?: string;
-    motherIncome?: string;
-    motherNik?: string;
-    guardianName?: string;
-    guardianBirthYear?: string;
-    guardianEducation?: string;
-    guardianOccupation?: string;
-    guardianIncome?: string;
-    guardianNik?: string;
-    kipNumber?: string;
-    kipName?: string;
-    kksPkhNumber?: string;
-    birthCertificateRegNo?: string;
-    previousSchool?: string;
-    childOrder?: string;
-    kkNumber?: string;
-    weight?: string;
-    height?: string;
-    headCircumference?: string;
-    siblingsCount?: string;
-}
 
 export default function Home() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
