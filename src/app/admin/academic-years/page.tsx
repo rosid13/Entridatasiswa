@@ -144,11 +144,11 @@ export default function AcademicYearsManagementPage() {
     };
     
     if (pageLoading) {
-        return <div className="flex min-h-screen items-center justify-center bg-background"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
+        return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
     }
     
     return (
-        <div className="flex flex-col min-h-screen bg-background">
+        <div className="flex flex-col min-h-screen">
             <main className="flex-grow p-4 sm:p-6 md:p-8">
                 <div className="max-w-4xl mx-auto space-y-8">
                     <header className="flex items-center gap-4">

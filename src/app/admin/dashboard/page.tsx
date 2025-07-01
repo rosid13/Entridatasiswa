@@ -127,16 +127,16 @@ export default function AdminDashboardPage() {
 
     if (pageLoading || isYearLoading || !activeYear) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-background">
+            <div className="flex min-h-screen items-center justify-center">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-background">
+        <div className="flex flex-col min-h-screen">
             <main className="flex-grow">
-                 <header className="bg-card border-b">
+                 <header className="bg-card/70 backdrop-blur-md border-b">
                     <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-6">
                         <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
                         <div className="flex items-center flex-wrap gap-2">

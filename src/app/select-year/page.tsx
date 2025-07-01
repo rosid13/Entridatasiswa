@@ -90,14 +90,14 @@ export default function SelectYearPage() {
 
     if (isCheckingAuth || isLoadingYears) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-background">
+            <div className="flex min-h-screen items-center justify-center">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
         );
     }
     
     return (
-        <div className="flex flex-col min-h-screen bg-background">
+        <div className="flex flex-col min-h-screen">
             <main className="flex flex-grow flex-col items-center justify-center p-4">
                 <div className="w-full max-w-sm space-y-8">
                     <div className="text-center">
