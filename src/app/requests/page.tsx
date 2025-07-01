@@ -160,7 +160,7 @@ export default function RequestsPage() {
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Permintaan Perbaikan</h1>
+                            <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">Permintaan Perbaikan</h1>
                             <p className="text-muted-foreground mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
                         </div>
                     </div>

@@ -157,7 +157,7 @@ export default function Home() {
         <header className="bg-card/70 backdrop-blur-md border-b sticky top-0 z-10">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-6">
               <div className='text-left'>
-                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Manajemen Data Siswa</h1>
+                  <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">Manajemen Data Siswa</h1>
                   <p className="text-muted-foreground mt-3 max-w-2xl">Platform terpusat untuk mengelola informasi siswa secara efisien, modern, dan aman.</p>
               </div>
               <div className="flex items-center flex-wrap gap-2 justify-start sm:justify-end">

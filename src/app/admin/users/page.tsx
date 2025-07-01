@@ -184,7 +184,7 @@ export default function UserManagementPage() {
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Manajemen Pengguna</h1>
+                            <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">Manajemen Pengguna</h1>
                             <p className="text-muted-foreground mt-2">Daftarkan pengguna baru dan kelola peran mereka.</p>
                         </div>
                     </div>

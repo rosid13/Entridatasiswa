@@ -138,7 +138,7 @@ export default function AdminDashboardPage() {
             <main className="flex-grow">
                  <header className="bg-card/70 backdrop-blur-md border-b sticky top-0 z-10">
                     <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-6">
-                        <h1 className="text-4xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Admin Dashboard</h1>
+                        <h1 className="text-4xl font-bold text-white drop-shadow-lg">Admin Dashboard</h1>
                         <div className="flex items-center flex-wrap gap-2">
                             <Button variant="outline" onClick={() => router.push('/select-year')}>
                                 <Calendar className="mr-2 h-4 w-4" />
