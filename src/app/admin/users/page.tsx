@@ -175,9 +175,9 @@ export default function UserManagementPage() {
     
     return (
         <div className="flex flex-col min-h-screen">
-            <main className="flex-grow p-4 sm:p-6 md:p-8">
-                <div className="max-w-7xl mx-auto space-y-8">
-                    <header className="flex items-center gap-4">
+            <main className="flex-grow">
+                <header className="bg-card/70 backdrop-blur-md border-b sticky top-0 z-10">
+                    <div className="max-w-7xl mx-auto flex items-center gap-4 p-4 sm:p-6">
                         <Link href="/admin/dashboard" passHref>
                             <Button variant="outline" size="icon">
                                 <ArrowLeft className="h-4 w-4" />
@@ -187,8 +187,10 @@ export default function UserManagementPage() {
                             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Manajemen Pengguna</h1>
                             <p className="text-muted-foreground mt-2">Daftarkan pengguna baru dan kelola peran mereka.</p>
                         </div>
-                    </header>
+                    </div>
+                </header>
 
+                <div className="max-w-7xl mx-auto space-y-8 p-4 sm:p-6 md:p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-1">
                             <Card>

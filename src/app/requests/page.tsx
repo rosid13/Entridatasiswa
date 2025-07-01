@@ -151,9 +151,9 @@ export default function RequestsPage() {
     
     return (
         <div className="flex flex-col min-h-screen">
-            <main className="flex-grow p-4 sm:p-6 md:p-8">
-                <div className="max-w-7xl mx-auto">
-                    <header className="flex items-center gap-4 mb-10">
+            <main className="flex-grow">
+                <header className="bg-card/70 backdrop-blur-md border-b sticky top-0 z-10">
+                    <div className="max-w-7xl mx-auto flex items-center gap-4 p-4 sm:p-6">
                         <Link href="/admin/dashboard" passHref>
                             <Button variant="outline" size="icon">
                                 <ArrowLeft className="h-4 w-4" />
@@ -163,7 +163,9 @@ export default function RequestsPage() {
                             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Permintaan Perbaikan</h1>
                             <p className="text-muted-foreground mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
                         </div>
-                    </header>
+                    </div>
+                </header>
+                <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
                     <Card>
                         <CardHeader>
                             <CardTitle>Daftar Permintaan Tertunda</CardTitle>

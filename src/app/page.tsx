@@ -153,9 +153,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <main className="flex-grow p-4 sm:p-6 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
+      <main className="flex-grow">
+        <header className="bg-card/70 backdrop-blur-md border-b sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-6">
               <div className='text-left'>
                   <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Manajemen Data Siswa</h1>
                   <p className="text-muted-foreground mt-3 max-w-2xl">Platform terpusat untuk mengelola informasi siswa secara efisien, modern, dan aman.</p>
@@ -178,7 +178,10 @@ export default function Home() {
                       Logout
                   </Button>
               </div>
-          </header>
+          </div>
+        </header>
+
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
           <div ref={formRef}>
             <StudentForm 
               studentToEdit={editingStudent} 

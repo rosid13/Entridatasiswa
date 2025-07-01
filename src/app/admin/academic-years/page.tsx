@@ -149,16 +149,18 @@ export default function AcademicYearsManagementPage() {
     
     return (
         <div className="flex flex-col min-h-screen">
-            <main className="flex-grow p-4 sm:p-6 md:p-8">
-                <div className="max-w-4xl mx-auto space-y-8">
-                    <header className="flex items-center gap-4">
+            <main className="flex-grow">
+                <header className="bg-card/70 backdrop-blur-md border-b sticky top-0 z-10">
+                    <div className="max-w-4xl mx-auto flex items-center gap-4 p-4 sm:p-6">
                         <Link href="/admin/dashboard" passHref><Button variant="outline" size="icon"><ArrowLeft className="h-4 w-4" /></Button></Link>
                         <div>
                             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Manajemen Tahun Ajaran</h1>
                             <p className="text-muted-foreground mt-2">Tambah atau hapus tahun ajaran yang tersedia di aplikasi.</p>
                         </div>
-                    </header>
-
+                    </div>
+                </header>
+                
+                <div className="max-w-4xl mx-auto space-y-8 p-4 sm:p-6 md:p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-1">
                             <Card>

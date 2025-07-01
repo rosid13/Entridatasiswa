@@ -85,7 +85,7 @@ export default function LoginPage() {
     <div className="flex flex-col min-h-screen">
         <main className="flex flex-grow flex-col items-center justify-center p-4">
             <div className="w-full max-w-sm space-y-8">
-                <div className="text-center">
+                <div className="text-center bg-card/70 backdrop-blur-md p-8 rounded-lg border border-white/20 shadow-lg">
                     <GraduationCap className="mx-auto h-12 w-12 text-primary mb-4" />
                     <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm leading-tight">
                         <span className="block">SMP SUNAN AL-ANBIYA</span>
