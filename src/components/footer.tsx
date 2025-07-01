@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAcademicYear } from "@/context/academic-year-context";
@@ -10,7 +11,7 @@ export default function Footer() {
   const router = useRouter();
 
   return (
-    <footer className="w-full text-center p-4 mt-auto text-sm text-white bg-card/70 backdrop-blur-md border-t border-white/20">
+    <footer className="w-full text-center p-4 mt-auto text-sm text-black bg-card/70 backdrop-blur-md border-t border-white/20">
       <div className="flex flex-col sm:flex-row justify-center items-center gap-x-4 gap-y-2">
         <span>© 2025 SMP SUNAN AL-ANBIYA TAMAN. All Rights Reserved.</span>
         <span className="hidden sm:inline-block">•</span>
