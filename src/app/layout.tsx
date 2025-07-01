@@ -21,10 +21,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet"></link>
       </head>
       <body className="font-body antialiased">
-        <Providers>
-            {children}
-            <Toaster />
-        </Providers>
+        <div className="app-wrapper">
+          <Providers>
+              {children}
+              <Toaster />
+          </Providers>
+        </div>
       </body>
     </html>
   );
