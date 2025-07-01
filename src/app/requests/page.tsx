@@ -161,7 +161,7 @@ export default function RequestsPage() {
                         </Link>
                         <div>
                             <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">Permintaan Perbaikan</h1>
-                            <p className="text-muted-foreground mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
+                            <p className="text-white/80 mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
                         </div>
                     </div>
                 </header>
