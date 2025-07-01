@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -88,7 +87,7 @@ export default function LoginPage() {
                 <div className="text-center bg-card/70 backdrop-blur-md p-8 rounded-lg border border-white/20 shadow-lg">
                     <GraduationCap className="mx-auto h-12 w-12 text-white mb-4" />
                     <h1 className="flex flex-col items-center text-4xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-lg">
-                        <span className="-mb-2">SMP SUNAN AL-ANBIYA</span>
+                        <span>SMP SUNAN AL-ANBIYA</span>
                         <span>TAMAN</span>
                     </h1>
                     <p className="mt-4 text-white/80">

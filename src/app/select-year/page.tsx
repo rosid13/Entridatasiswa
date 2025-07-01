@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -102,8 +101,8 @@ export default function SelectYearPage() {
                 <div className="w-full max-w-sm space-y-8">
                     <div className="text-center">
                         <Calendar className="mx-auto h-12 w-12 text-primary mb-4" />
-                        <h1 className="text-3xl font-bold text-foreground">Pilih Tahun Ajaran</h1>
-                        <p className="mt-2 text-muted-foreground">
+                        <h1 className="text-3xl font-bold text-white">Pilih Tahun Ajaran</h1>
+                        <p className="mt-2 text-white/80">
                             Pilih tahun ajaran yang ingin Anda kelola.
                         </p>
                     </div>
