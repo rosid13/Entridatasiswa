@@ -253,7 +253,7 @@ export default function UserManagementPage() {
                                             <Skeleton className="h-12 w-full" />
                                         </div>
                                     ) : users.length > 0 ? (
-                                        <div className="border rounded-md">
+                                        <div className="border rounded-md overflow-x-auto">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>

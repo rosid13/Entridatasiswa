@@ -1,13 +1,14 @@
+
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
 import Link from 'next/link';
 import { doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import StudentForm from '@/components/student-form';
 import StudentList from '@/components/student-list';
-import StudentDetailModal from '@/components/student-detail-modal';
+const StudentDetailModal = lazy(() => import('@/components/student-detail-modal'));
 import { db, auth, logAndReportError } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { Student } from '@/types/student';
@@ -72,34 +73,34 @@ export default function Home() {
     }
   }, [activeYear, isYearLoading, router]);
 
-  const handleStudentClick = (student: Student) => {
+  const handleStudentClick = useCallback((student: Student) => {
     setSelectedStudent(student);
     setEditingStudent(null);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedStudent(null);
-  };
+  }, []);
 
-  const handleStartEdit = (student: Student) => {
+  const handleStartEdit = useCallback((student: Student) => {
     setSelectedStudent(null);
     setEditingStudent(student);
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
   
-  const handleSuccess = (updatedStudent?: Student) => {
+  const handleSuccess = useCallback((updatedStudent?: Student) => {
     if (updatedStudent) {
       setSelectedStudent(updatedStudent);
     }
     setEditingStudent(null);
     setListKey(prev => prev + 1); 
-  };
+  }, []);
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = useCallback(() => {
     setEditingStudent(null);
-  }
+  }, []);
 
-  const handleDelete = async (studentId: string) => {
+  const handleDelete = useCallback(async (studentId: string) => {
     if (!selectedStudent || session?.role !== 'admin') return;
     try {
       const studentRef = doc(db, "siswa", studentId);
@@ -118,9 +119,9 @@ export default function Home() {
         description: "Terjadi kesalahan. Periksa koneksi atau hak akses Anda.",
       });
     }
-  };
+  }, [selectedStudent, session?.role, toast]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await signOut(auth);
       toast({
@@ -136,7 +137,7 @@ export default function Home() {
         description: "Terjadi kesalahan saat keluar.",
       });
     }
-  };
+  }, [router, toast]);
 
   if (loading || isYearLoading || !activeYear) {
     return (
@@ -154,12 +155,12 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <main className="flex-grow p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <header className="flex justify-between items-center mb-10">
+          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
               <div className='text-left'>
                   <h1 className="text-4xl md:text-5xl font-bold text-foreground">Manajemen Data Siswa</h1>
                   <p className="text-muted-foreground mt-3 max-w-2xl">Platform terpusat untuk mengelola informasi siswa secara efisien, modern, dan aman.</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center flex-wrap gap-2 justify-start sm:justify-end">
                   <Button variant="outline" onClick={() => router.push('/select-year')}>
                       <Calendar className="mr-2 h-4 w-4" />
                       Ubah Tahun Ajaran
@@ -187,6 +188,7 @@ export default function Home() {
           </div>
           <StudentList onStudentClick={handleStudentClick} key={listKey} activeYear={activeYear} />
         </div>
+        <Suspense fallback={null}>
          <StudentDetailModal
           student={selectedStudent}
           isOpen={!!selectedStudent}
@@ -195,6 +197,7 @@ export default function Home() {
           onDelete={handleDelete}
           userSession={session}
         />
+        </Suspense>
       </main>
       <Footer />
     </div>

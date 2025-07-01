@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -261,7 +262,7 @@ export default function StudentList({ onStudentClick, activeYear }: StudentListP
            </div>
         ) : filteredStudents.length > 0 ? (
           <>
-            <div className="border rounded-md">
+            <div className="border rounded-md overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>

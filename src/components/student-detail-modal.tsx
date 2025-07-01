@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { type User } from 'firebase/auth';
 import {
   Dialog,
@@ -26,8 +27,9 @@ import { format } from "date-fns";
 import { id } from 'date-fns/locale';
 import type { Student } from '@/types/student';
 import { Badge } from './ui/badge';
-import CorrectionRequestModal from './correction-request-modal';
 import type { AppSession } from '@/app/page';
+
+const CorrectionRequestModal = lazy(() => import('./correction-request-modal'));
 
 interface StudentDetailModalProps {
   student: Student | null;
@@ -175,27 +177,23 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
 
             </div>
           </ScrollArea>
-          <DialogFooter className="pt-4 sm:justify-between w-full border-t">
-              <div>
-                {userSession?.role === 'admin' && (
-                  <Button variant="destructive" onClick={() => setIsAlertOpen(true)}>
+          <DialogFooter className="pt-4 border-t flex flex-wrap gap-2 justify-end">
+              {userSession?.role === 'admin' && (
+                  <Button variant="destructive" onClick={() => setIsAlertOpen(true)} className="mr-auto">
                       Hapus Data
                   </Button>
-                )}
-              </div>
-              <div className='flex gap-2 flex-wrap justify-end'>
-                  <Button variant="secondary" onClick={() => setIsCorrectionModalOpen(true)}>
-                      Ajukan Perbaikan Data
-                  </Button>
-                  <Button variant="outline" onClick={onClose}>
-                      Tutup
-                  </Button>
-                  {userSession?.role === 'admin' && (
-                    <Button onClick={() => onEdit(student)}>
-                        Edit Data
-                    </Button>
-                  )}
-              </div>
+              )}
+              <Button variant="secondary" onClick={() => setIsCorrectionModalOpen(true)}>
+                  Ajukan Perbaikan Data
+              </Button>
+              <Button variant="outline" onClick={onClose}>
+                  Tutup
+              </Button>
+              {userSession?.role === 'admin' && (
+                <Button onClick={() => onEdit(student)}>
+                    Edit Data
+                </Button>
+              )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -215,12 +213,14 @@ export default function StudentDetailModal({ student, isOpen, onClose, onEdit, o
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <CorrectionRequestModal 
-        isOpen={isCorrectionModalOpen}
-        onClose={() => setIsCorrectionModalOpen(false)}
-        student={student}
-        user={userSession?.user ?? null}
-      />
+      <Suspense fallback={null}>
+        <CorrectionRequestModal 
+          isOpen={isCorrectionModalOpen}
+          onClose={() => setIsCorrectionModalOpen(false)}
+          student={student}
+          user={userSession?.user ?? null}
+        />
+      </Suspense>
     </>
   );
 }

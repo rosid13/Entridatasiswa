@@ -137,9 +137,9 @@ export default function AdminDashboardPage() {
         <div className="flex flex-col min-h-screen bg-background">
             <main className="flex-grow">
                  <header className="bg-card border-b">
-                    <div className="max-w-7xl mx-auto flex justify-between items-center p-4 sm:p-6">
+                    <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-6">
                         <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center flex-wrap gap-2">
                             <Button variant="outline" onClick={() => router.push('/select-year')}>
                                 <Calendar className="mr-2 h-4 w-4" />
                                 Ubah Tahun Ajaran
