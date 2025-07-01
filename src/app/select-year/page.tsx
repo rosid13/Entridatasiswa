@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc, collection, query, getDocs, orderBy } from 'firebase/firestore';
 
 import { useAcademicYear } from '@/context/academic-year-context';
 import { auth, db } from '@/lib/firebase';
@@ -14,26 +15,59 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Calendar } from 'lucide-react';
 import Footer from '@/components/footer';
-
-const academicYears = ["2023/2024", "2024/2025", "2025/2026", "2026/2027"];
+import Link from 'next/link';
 
 export default function SelectYearPage() {
     const router = useRouter();
     const { setActiveYear, activeYear } = useAcademicYear();
     const [selectedYear, setSelectedYear] = useState<string>(activeYear || "");
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+    const [userRole, setUserRole] = useState<'user' | 'admin' | null>(null);
+    const [availableYears, setAvailableYears] = useState<string[]>([]);
+    const [isLoadingYears, setIsLoadingYears] = useState(true);
     const { toast } = useToast();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                router.push('/login');
-            } else {
+        const unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
+            if (user) {
+                const userRoleRef = doc(db, "userRoles", user.uid);
+                const docSnap = await getDoc(userRoleRef);
+                const role = docSnap.exists() ? docSnap.data().role : 'user';
+                setUserRole(role);
                 setIsCheckingAuth(false);
+            } else {
+                router.push('/login');
             }
         });
         return () => unsubscribe();
     }, [router]);
+
+    useEffect(() => {
+        const fetchYears = async () => {
+            setIsLoadingYears(true);
+            try {
+                const yearsCollection = collection(db, "availableAcademicYears");
+                const q = query(yearsCollection, orderBy("year", "desc"));
+                const querySnapshot = await getDocs(q);
+                const years = querySnapshot.docs.map(doc => doc.data().year as string);
+                setAvailableYears(years);
+                if (years.length > 0 && !activeYear) {
+                    setSelectedYear(years[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching academic years:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Gagal Memuat Tahun Ajaran",
+                    description: "Tidak dapat mengambil daftar tahun ajaran. Silakan coba lagi.",
+                });
+            } finally {
+                setIsLoadingYears(false);
+            }
+        };
+        fetchYears();
+    }, [toast, activeYear]);
+
 
     const handleContinue = async () => {
         if (!selectedYear) {
@@ -47,23 +81,14 @@ export default function SelectYearPage() {
 
         setActiveYear(selectedYear);
         
-        const currentUser = auth.currentUser;
-        if(currentUser) {
-            const userRoleRef = doc(db, "userRoles", currentUser.uid);
-            const docSnap = await getDoc(userRoleRef);
-            const userRole = (docSnap.exists() && docSnap.data().role) ? docSnap.data().role : 'user';
-            
-            if (userRole === 'admin') {
-                router.push('/admin/dashboard');
-            } else {
-                router.push('/');
-            }
+        if (userRole === 'admin') {
+            router.push('/admin/dashboard');
         } else {
-             router.push('/login');
+            router.push('/');
         }
     };
 
-    if (isCheckingAuth) {
+    if (isCheckingAuth || isLoadingYears) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-background">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -88,19 +113,37 @@ export default function SelectYearPage() {
                             <CardDescription>Pilihan Anda akan diterapkan di seluruh aplikasi.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <Select onValueChange={setSelectedYear} value={selectedYear}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Pilih tahun..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {academicYears.map(year => (
-                                        <SelectItem key={year} value={year}>{year}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <Button className="w-full" onClick={handleContinue} disabled={!selectedYear}>
-                                Lanjutkan
-                            </Button>
+                             {availableYears.length > 0 ? (
+                                <>
+                                    <Select onValueChange={setSelectedYear} value={selectedYear}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih tahun..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {availableYears.map(year => (
+                                                <SelectItem key={year} value={year}>{year}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Button className="w-full" onClick={handleContinue} disabled={!selectedYear}>
+                                        Lanjutkan
+                                    </Button>
+                                </>
+                             ) : (
+                                <div className='text-center text-muted-foreground text-sm space-y-4'>
+                                    <p>
+                                    {userRole === 'admin' 
+                                        ? "Belum ada tahun ajaran yang ditambahkan. Silakan tambahkan satu untuk melanjutkan."
+                                        : "Tidak ada tahun ajaran yang tersedia. Harap hubungi admin."
+                                    }
+                                    </p>
+                                    {userRole === 'admin' && (
+                                        <Link href="/admin/academic-years" passHref>
+                                            <Button className='w-full'>Buka Manajemen Tahun Ajaran</Button>
+                                        </Link>
+                                    )}
+                                </div>
+                             )}
                         </CardContent>
                     </Card>
                 </div>

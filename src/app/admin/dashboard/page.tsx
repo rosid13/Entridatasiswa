@@ -15,7 +15,7 @@ import type { AppSession } from '@/app/page';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Users, FileCheck2, LogOut, UserPlus, List, Calendar } from 'lucide-react';
+import { Loader2, Users, FileCheck2, LogOut, UserPlus, List, Calendar, Archive } from 'lucide-react';
 import Footer from '@/components/footer';
 
 export default function AdminDashboardPage() {
@@ -192,7 +192,7 @@ export default function AdminDashboardPage() {
                                 <CardTitle>Manajemen & Navigasi</CardTitle>
                                 <CardDescription>Akses cepat ke halaman manajemen utama.</CardDescription>
                             </CardHeader>
-                            <CardContent className="grid md:grid-cols-3 gap-4">
+                            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Link href="/" passHref>
                                     <Button className="w-full" variant="outline"><List className="mr-2 h-4 w-4"/> Kelola Data Siswa</Button>
                                 </Link>
@@ -201,6 +201,9 @@ export default function AdminDashboardPage() {
                                 </Link>
                                 <Link href="/admin/users" passHref>
                                     <Button className="w-full" ><UserPlus className="mr-2 h-4 w-4"/> Manajemen Pengguna</Button>
+                                </Link>
+                                <Link href="/admin/academic-years" passHref>
+                                    <Button className="w-full" ><Archive className="mr-2 h-4 w-4"/> Manajemen Tahun Ajaran</Button>
                                 </Link>
                             </CardContent>
                         </Card>
