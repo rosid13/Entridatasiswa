@@ -1,9 +1,8 @@
-
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { collection, query, getDocs, limit, startAfter, DocumentData, QueryDocumentSnapshot, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db, logAndReportError } from '@/lib/firebase';
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -63,7 +62,7 @@ export default function StudentList({ onStudentClick, activeYear }: StudentListP
       setLastVisible(lastVisibleDoc);
       setHasMore(documentSnapshots.docs.length === STUDENTS_PER_PAGE);
     } catch (error: any) {
-      console.error("Error fetching students: ", error);
+      logAndReportError(error, "Error fetching students");
       toast({
         variant: "destructive",
         title: "Gagal Memuat Data",
@@ -105,7 +104,7 @@ export default function StudentList({ onStudentClick, activeYear }: StudentListP
         setHasMore(documentSnapshots.docs.length === STUDENTS_PER_PAGE);
 
     } catch (error) {
-        console.error("Error fetching more students: ", error);
+        logAndReportError(error, "Error fetching more students");
         toast({
             variant: "destructive",
             title: "Gagal Memuat Data Lanjutan",
@@ -223,7 +222,7 @@ export default function StudentList({ onStudentClick, activeYear }: StudentListP
           description: "Data siswa yang dimuat telah diekspor ke file Excel.",
       });
     } catch (error) {
-        console.error("Failed to export data to Excel:", error);
+        logAndReportError(error, "Failed to export data to Excel");
         toast({
             variant: "destructive",
             title: "Gagal Mengekspor",

@@ -36,7 +36,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase";
+import { db, logAndReportError } from "@/lib/firebase";
 import type { Student } from "@/types/student";
 import { useAcademicYear } from "@/context/academic-year-context";
 
@@ -243,7 +243,7 @@ export default function StudentForm({ studentToEdit, onSuccess, onCancel }: Stud
         onSuccess();
       }
     } catch (e) {
-      console.error("Error processing document: ", e);
+      logAndReportError(e, "Error processing student document");
       toast({
         variant: "destructive",
         title: "Gagal!",

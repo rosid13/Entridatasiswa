@@ -8,7 +8,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { type User } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 
-import { db } from "@/lib/firebase";
+import { db, logAndReportError } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import type { Student } from "@/types/student";
 
@@ -161,7 +161,7 @@ export default function CorrectionRequestModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error submitting correction request:", error);
+      logAndReportError(error, "Error submitting correction request");
       toast({
         variant: "destructive",
         title: "Gagal!",

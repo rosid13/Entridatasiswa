@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, logAndReportError } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,7 +58,7 @@ export default function LoginPage() {
       });
       // The onAuthStateChanged listener will handle redirection.
     } catch (error: any) {
-      console.error("Login failed: ", error);
+      logAndReportError(error, "Login failed");
       const message = error.code === 'auth/invalid-credential' 
           ? "Email atau password salah. Silakan coba lagi."
           : "Terjadi kesalahan saat login. Silakan coba lagi.";

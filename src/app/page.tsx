@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -9,7 +8,7 @@ import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import StudentForm from '@/components/student-form';
 import StudentList from '@/components/student-list';
 import StudentDetailModal from '@/components/student-detail-modal';
-import { db, auth } from '@/lib/firebase';
+import { db, auth, logAndReportError } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { Student } from '@/types/student';
 import { Button } from '@/components/ui/button';
@@ -46,7 +45,7 @@ export default function Home() {
           try {
             await setDoc(userRoleRef, { role: 'user', email: currentUser.email });
           } catch (error) {
-            console.error("Failed to create user role:", error);
+            logAndReportError(error, "Failed to create user role");
             toast({
               variant: "destructive",
               title: "Gagal Menginisialisasi Akun",
@@ -112,7 +111,7 @@ export default function Home() {
       setSelectedStudent(null);
       setListKey(prev => prev + 1); 
     } catch (error) {
-       console.error("Error deleting document: ", error);
+       logAndReportError(error, "Error deleting document");
        toast({
         variant: "destructive",
         title: "Gagal Menghapus Data",
@@ -130,7 +129,7 @@ export default function Home() {
       });
       router.push('/login');
     } catch (error) {
-      console.error("Logout failed: ", error);
+      logAndReportError(error, "Logout failed");
       toast({
         variant: "destructive",
         title: "Gagal Logout!",

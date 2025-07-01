@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, query, getDocs, doc, setDoc, getDoc, orderBy, addDoc, where, deleteDoc } from 'firebase/firestore';
 
-import { db, auth } from '@/lib/firebase';
+import { db, auth, logAndReportError } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { AppSession } from '@/app/page';
 
@@ -92,7 +92,7 @@ export default function AcademicYearsManagementPage() {
             } as AcademicYear));
             setYears(yearsData);
         } catch (error) {
-            console.error("Error fetching academic years:", error);
+            logAndReportError(error, "Error fetching academic years");
             toast({ variant: "destructive", title: "Gagal Memuat Data", description: "Tidak dapat mengambil daftar tahun ajaran." });
         } finally {
             setYearsLoading(false);
@@ -120,7 +120,7 @@ export default function AcademicYearsManagementPage() {
             form.reset();
             fetchYears();
         } catch (error) {
-            console.error("Error adding academic year:", error);
+            logAndReportError(error, "Error adding academic year");
             toast({ variant: "destructive", title: "Gagal Menambah", description: "Terjadi kesalahan saat menyimpan data." });
         } finally {
             setIsSubmitting(false);
@@ -136,7 +136,7 @@ export default function AcademicYearsManagementPage() {
             setYearToDelete(null);
             fetchYears();
         } catch (error) {
-            console.error("Error deleting academic year:", error);
+            logAndReportError(error, "Error deleting academic year");
             toast({ variant: "destructive", title: "Gagal Menghapus", description: "Terjadi kesalahan saat menghapus data." });
         } finally {
             setIsSubmitting(false);

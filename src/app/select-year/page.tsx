@@ -7,7 +7,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, collection, query, getDocs, orderBy } from 'firebase/firestore';
 
 import { useAcademicYear } from '@/context/academic-year-context';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, logAndReportError } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,7 +55,7 @@ export default function SelectYearPage() {
                     setSelectedYear(years[0]);
                 }
             } catch (error) {
-                console.error("Error fetching academic years:", error);
+                logAndReportError(error, "Error fetching academic years");
                 toast({
                     variant: "destructive",
                     title: "Gagal Memuat Tahun Ajaran",

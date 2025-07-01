@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { collection, query, where, onSnapshot, doc, updateDoc, writeBatch, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { db, auth } from '@/lib/firebase';
+import { db, auth, logAndReportError } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { format } from "date-fns";
 import { id } from 'date-fns/locale';
@@ -80,7 +80,7 @@ export default function RequestsPage() {
             setRequests(requestsData);
             setPageLoading(false);
         }, (error) => {
-            console.error("Error fetching requests: ", error);
+            logAndReportError(error, "Error fetching requests");
             toast({ 
                 variant: "destructive", 
                 title: "Gagal Memuat Permintaan",
@@ -121,7 +121,7 @@ export default function RequestsPage() {
             });
             setSelectedRequest(null);
         } catch (error) {
-            console.error(`Error ${action}ing request: `, error);
+            logAndReportError(error, `Error ${action}ing request`);
             toast({
                 variant: "destructive",
                 title: "Gagal Memproses Permintaan",

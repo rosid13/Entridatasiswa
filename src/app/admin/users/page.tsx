@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, query, getDocs, doc, setDoc, getDoc, updateDoc, orderBy } from 'firebase/firestore';
 
-import { db, auth } from '@/lib/firebase';
+import { db, auth, logAndReportError } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import type { AppSession } from '@/app/page';
 import { useAcademicYear } from '@/context/academic-year-context';
@@ -100,7 +100,7 @@ export default function UserManagementPage() {
             } as ManagedUser));
             setUsers(usersData);
         } catch (error) {
-            console.error("Error fetching users:", error);
+            logAndReportError(error, "Error fetching users");
             toast({ 
                 variant: "destructive", 
                 title: "Gagal Memuat Pengguna",
@@ -132,7 +132,7 @@ export default function UserManagementPage() {
             form.reset();
             fetchUsers(); 
         } catch (error: any) {
-            console.error("Error registering user: ", error);
+            logAndReportError(error, "Error registering user");
             const message = error.code === 'auth/email-already-in-use' 
                 ? 'Email ini sudah terdaftar.' 
                 : 'Gagal mendaftarkan pengguna.';
@@ -156,7 +156,7 @@ export default function UserManagementPage() {
             });
             fetchUsers(); 
         } catch (error) {
-            console.error("Error updating role:", error);
+            logAndReportError(error, "Error updating role");
             toast({
                 variant: "destructive",
                 title: "Gagal Memperbarui Peran",

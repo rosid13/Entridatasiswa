@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { collection, query, where, onSnapshot, getCountFromServer, doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { db, auth } from '@/lib/firebase';
+import { db, auth, logAndReportError } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useAcademicYear } from '@/context/academic-year-context';
 
@@ -81,7 +81,7 @@ export default function AdminDashboardPage() {
                     pendingRequestsCount: requestsSnapshot.data().count,
                 });
             } catch (error) {
-                console.error("Error fetching stats:", error);
+                logAndReportError(error, "Error fetching stats");
                 toast({ 
                     variant: "destructive", 
                     title: "Gagal Memuat Statistik",
@@ -99,12 +99,12 @@ export default function AdminDashboardPage() {
         studentsUnsub = onSnapshot(studentQuery, (snap) => {
              setStats(prev => ({...prev, studentCount: snap.size}));
         }, (error) => {
-            console.error("Real-time student count failed:", error);
+            logAndReportError(error, "Real-time student count failed");
         });
         requestsUnsub = onSnapshot(query(collection(db, "correctionRequests"), where("status", "==", "pending")), (snap) => {
              setStats(prev => ({...prev, pendingRequestsCount: snap.size}));
         }, (error) => {
-            console.error("Real-time request count failed:", error);
+            logAndReportError(error, "Real-time request count failed");
         });
 
         return () => {
@@ -120,7 +120,7 @@ export default function AdminDashboardPage() {
             toast({ title: "Logout Berhasil", description: "Anda telah keluar dari sesi." });
             router.push('/login');
         } catch (error) {
-            console.error("Logout failed: ", error);
+            logAndReportError(error, "Logout failed");
             toast({ variant: "destructive", title: "Gagal Logout!", description: "Terjadi kesalahan saat keluar." });
         }
     };
