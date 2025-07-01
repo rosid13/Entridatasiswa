@@ -154,7 +154,7 @@ export default function AcademicYearsManagementPage() {
                     <header className="flex items-center gap-4">
                         <Link href="/admin/dashboard" passHref><Button variant="outline" size="icon"><ArrowLeft className="h-4 w-4" /></Button></Link>
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-bold text-foreground">Manajemen Tahun Ajaran</h1>
+                            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm">Manajemen Tahun Ajaran</h1>
                             <p className="text-muted-foreground mt-2">Tambah atau hapus tahun ajaran yang tersedia di aplikasi.</p>
                         </div>
                     </header>

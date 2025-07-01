@@ -87,10 +87,10 @@ export default function LoginPage() {
             <div className="w-full max-w-sm space-y-8">
                 <div className="text-center">
                     <GraduationCap className="mx-auto h-12 w-12 text-primary mb-4" />
-                    <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight whitespace-nowrap">
-                    SMP SUNAN AL-ANBIYA
+                    <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-primary via-fuchsia-500 to-secondary bg-clip-text text-transparent drop-shadow-sm leading-tight">
+                        <span className="block">SMP SUNAN AL-ANBIYA</span>
+                        <span className="block -mt-1 sm:-mt-2">TAMAN</span>
                     </h1>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-primary -mt-1">TAMAN</h2>
                     <p className="mt-4 text-muted-foreground">
                     Sistem Manajemen Data Siswa
                     </p>
