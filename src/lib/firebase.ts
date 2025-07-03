@@ -21,13 +21,11 @@ const auth = getAuth(app);
 
 
 /**
- * Logs an error to the console. 
- * Firebase Crashlytics and Analytics have been removed to resolve Vercel build issues.
+ * Logs an error to the console for debugging purposes.
  * @param error The caught error object.
  * @param contextMessage A descriptive message providing context about where the error occurred.
  */
 export const logAndReportError = (error: unknown, contextMessage: string) => {
-    // Always log to console for development debugging
     console.error(contextMessage, error);
 };
 
