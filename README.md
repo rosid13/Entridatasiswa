@@ -1,3 +1,4 @@
+
 # Dokumentasi Aplikasi: Sistem Manajemen Data Siswa - SMP Sunan Al-Anbiya Taman
 
 ## 1. Gambaran Umum Aplikasi
@@ -15,60 +16,106 @@ Aplikasi ini memiliki dua peran pengguna utama:
 ## 2. Fitur-Fitur Utama
 
 ### a. Otentikasi dan Manajemen Peran
-- **Login:** Pengguna masuk ke sistem menggunakan email dan password yang terdaftar.
-- **Manajemen Pengguna (Admin):** Admin dapat membuat akun baru untuk pengguna lain dan menetapkan peran mereka (`admin` atau `user`).
-- **Keamanan:** Sistem menggunakan Firebase Authentication untuk mengelola sesi dan keamanan akun.
+- **Login:** Pengguna masuk ke sistem menggunakan email dan password yang terdaftar via Firebase Authentication.
+- **Manajemen Peran:** Peran pengguna ('admin' atau 'user') disimpan dalam koleksi `userRoles` di Firestore, yang di-link melalui UID pengguna.
+- **Manajemen Akun (Admin):** Admin dapat membuat akun baru untuk pengguna lain dan menetapkan peran mereka.
 
 ### b. Manajemen Tahun Ajaran
-- **Seleksi Tahun Ajaran:** Setelah login, semua pengguna harus memilih tahun ajaran yang ingin mereka kelola. Semua data yang ditampilkan dan ditambahkan akan terikat pada tahun ajaran yang aktif.
-- **Manajemen (Admin):** Admin memiliki halaman khusus untuk menambah atau menghapus tahun ajaran yang tersedia di sistem (misal: "2024/2025", "2025/2026").
+- **Seleksi Tahun Ajaran:** Setelah login, semua pengguna harus memilih tahun ajaran yang ingin mereka kelola. Semua data yang ditampilkan dan ditambahkan terikat pada tahun ajaran yang aktif. Pilihan ini disimpan di `localStorage` browser.
+- **Manajemen (Admin):** Admin memiliki halaman khusus untuk menambah atau menghapus tahun ajaran yang tersedia di sistem (misal: "2024/2025").
 
 ### c. Manajemen Data Siswa (CRUD)
-- **Pendaftaran Siswa Baru:** Pengguna (Admin dan User) dapat mengisi formulir pendaftaran yang komprehensif untuk menambahkan siswa baru. Formulir ini mencakup informasi pribadi, alamat, data orang tua/wali, dan data pendukung lainnya.
-- **Daftar dan Pencarian Siswa:** Data semua siswa ditampilkan dalam bentuk tabel yang interaktif. Pengguna dapat mencari siswa berdasarkan nama atau NISN.
-- **Detail Siswa:** Dengan mengklik nama siswa pada tabel, sebuah modal akan muncul menampilkan semua data siswa secara terperinci dan terorganisir.
-- **Edit Data (Admin):** Admin dapat langsung mengedit data siswa melalui formulir yang sama dengan formulir pendaftaran.
-- **Hapus Data (Admin):** Admin memiliki kewenangan untuk menghapus data siswa secara permanen dari sistem.
+- **Pendaftaran Siswa Baru:** Pengguna (Admin dan User) dapat mengisi formulir pendaftaran yang komprehensif untuk menambahkan siswa baru.
+- **Daftar dan Pencarian Siswa:** Data semua siswa ditampilkan dalam bentuk tabel yang interaktif, dapat dicari berdasarkan nama atau NISN.
+- **Detail Siswa:** Modal menampilkan semua data siswa secara terperinci.
+- **Edit Data (Admin):** Admin dapat langsung mengedit data siswa.
+- **Hapus Data (Admin):** Admin dapat menghapus data siswa.
 
 ### d. Permintaan Perbaikan Data
-- **Alur Pengajuan (User):** Jika pengguna dengan peran `User` menemukan kesalahan data, mereka tidak bisa mengeditnya langsung. Sebagai gantinya, mereka dapat mengajukan "Permintaan Perbaikan Data" melalui modal detail siswa. Mereka memilih bidang yang salah, memasukkan nilai yang benar, dan memberikan alasan perbaikan.
-- **Tinjauan (Admin):** Admin akan menerima notifikasi dan dapat meninjau semua permintaan yang tertunda di halaman khusus. Admin dapat menyetujui (data akan otomatis diperbarui) atau menolak permintaan tersebut.
+- **Alur Pengajuan (User):** Jika pengguna 'User' menemukan kesalahan data, mereka dapat mengajukan "Permintaan Perbaikan Data".
+- **Tinjauan (Admin):** Admin meninjau semua permintaan yang tertunda di halaman khusus, di mana mereka dapat menyetujui (data akan otomatis diperbarui) atau menolak permintaan.
 
 ### e. Ekspor Data ke Excel
-- Pengguna dapat mengekspor daftar siswa yang ditampilkan (termasuk hasil pencarian) ke dalam format file Excel (.xlsx). File ini berisi semua kolom data siswa dan diformat secara rapi untuk keperluan laporan.
+- Pengguna dapat mengekspor daftar siswa yang ditampilkan ke dalam format file Excel (.xlsx).
 
 ---
 
-## 3. Desain Antarmuka (UI) dan Pengalaman Pengguna (UX)
+## 3. Teknologi dan Komponen Penting
 
-### Desain Visual
-- **Palet Warna:** Desain aplikasi mengusung tema modern dengan kombinasi warna **putih, merah, dan biru**. Latar belakang kartu dan formulir berwarna putih untuk kontras maksimal, merah digunakan sebagai aksen utama untuk tombol aksi penting, dan biru sebagai aksen sekunder.
-- **Latar Belakang (Background):** Sebuah gambar latar belakang abstrak dinamis dengan nuansa ungu, magenta, dan biru digunakan di seluruh aplikasi untuk memberikan tampilan yang hidup dan modern.
-- **Tipografi:** Menggunakan font **'Inter'**, yang dikenal bersih dan sangat mudah dibaca untuk semua teks, dari judul hingga label formulir.
-- **Ikon:** Menggunakan ikon dari *library* **Lucide React** untuk memberikan visual yang konsisten dan bersih di seluruh aplikasi.
-
-### Pengalaman Pengguna
-- **Tata Letak Konsisten:** Aplikasi menggunakan tata letak yang konsisten dengan header dan footer yang jelas. Konten utama disajikan dalam bentuk kartu (*cards*) dengan sudut membulat dan bayangan halus, memberikan kesan "melayang" dan modern.
-- **Navigasi Intuitif:** Alur navigasi dirancang agar mudah diikuti. Admin memiliki dashboard sebagai pusat kendali, sementara pengguna lain langsung diarahkan ke daftar siswa.
-- **Formulir Terstruktur:** Formulir pendaftaran siswa dibagi menjadi beberapa bagian logis (Informasi Pribadi, Alamat, Data Keluarga, dll.) menggunakan *tabs* dan *cards* untuk mencegah pengguna merasa kewalahan.
-- **Responsif:** Desain dirancang agar dapat diakses dengan baik di berbagai ukuran layar.
-
-### Komponen UI Penting
-- **Formulir:** Menggunakan komponen dari **ShadCN UI** seperti `Input`, `Select`, `Textarea`, dan `Calendar` (untuk Date Picker). Validasi *real-time* disediakan untuk memandu pengguna.
-- **Tabel:** Tabel data siswa yang interaktif, memungkinkan pencarian dan pengurutan (jika diimplementasikan).
-- **Modal/Dialog:** Digunakan secara ekstensif untuk menampilkan detail data, formulir permintaan perbaikan, dan dialog konfirmasi (seperti saat menghapus data).
+- **Framework:** **Next.js** (dengan App Router)
+- **Backend & Database:** **Firebase**
+    - **Firestore:** Database NoSQL untuk semua data.
+    - **Firebase Authentication:** Untuk manajemen pengguna.
+- **Library Komponen UI:** **ShadCN UI**
+- **Styling:** **Tailwind CSS**
+- **Manajemen Form:** **React Hook Form** & **Zod** untuk validasi.
+- **Ekspor Data:** **XLSX**
 
 ---
 
-## 4. Teknologi dan Komponen Penting
+## 4. Panduan Setup untuk Proyek Baru
 
-- **Framework:** **Next.js** (dengan App Router) digunakan sebagai framework utama, memungkinkan rendering sisi server (SSR) dan pembuatan aplikasi web yang cepat dan modern.
-- **Backend & Database:** **Firebase** menjadi tulang punggung aplikasi, dengan:
-    - **Firestore:** Sebagai database NoSQL untuk menyimpan semua data (siswa, pengguna, permintaan perbaikan).
-    - **Firebase Authentication:** Untuk mengelola otentikasi pengguna (login, registrasi, sesi).
-- **Library Komponen UI:** **ShadCN UI**, yang menyediakan koleksi komponen React yang dapat disesuaikan dan dapat diakses, dibangun di atas Tailwind CSS.
-- **Styling:** **Tailwind CSS** digunakan untuk styling, memungkinkan pengembangan antarmuka yang cepat dengan pendekatan *utility-first*. Tema warna dan font disesuaikan secara global di `src/app/globals.css`.
-- **Manajemen Form:**
-    - **React Hook Form:** Untuk mengelola state formulir secara efisien.
-    - **Zod:** Untuk validasi skema data formulir, memastikan data yang masuk sesuai format yang diharapkan.
-- **Ekspor Data:** *Library* **XLSX** digunakan untuk fungsionalitas ekspor data ke file Excel.
+Untuk mereplikasi aplikasi ini dengan backend Firebase baru, ikuti langkah-langkah berikut.
+
+### a. Setup Proyek Firebase
+1.  Buat proyek baru di [Firebase Console](https://console.firebase.google.com/).
+2.  Aktifkan layanan berikut:
+    *   **Authentication:** Aktifkan metode login **Email/Password**.
+    *   **Firestore Database:** Buat database Firestore (mulai dalam mode produksi).
+
+### b. Struktur Database Firestore
+Anda perlu membuat koleksi berikut secara manual atau melalui aplikasi:
+
+1.  **`userRoles`**
+    *   **Tujuan:** Menyimpan peran setiap pengguna.
+    *   **Struktur Dokumen:**
+        *   *ID Dokumen:* `UID` pengguna dari Firebase Authentication.
+        *   *Fields:*
+            *   `email` (string): Email pengguna.
+            *   `role` (string): 'admin' atau 'user'.
+
+2.  **`availableAcademicYears`**
+    *   **Tujuan:** Menyimpan daftar tahun ajaran yang tersedia untuk dipilih.
+    *   **Struktur Dokumen:**
+        *   *ID Dokumen:* ID unik (auto-generated).
+        *   *Fields:*
+            *   `year` (string): Format "YYYY/YYYY", contoh: "2024/2025".
+
+3.  **`siswa`**
+    *   **Tujuan:** Koleksi utama yang menyimpan semua data siswa.
+    *   **Struktur Dokumen:** Lihat `src/types/student.ts` untuk daftar lengkap semua field yang memungkinkan. Field paling penting adalah:
+        *   `tahunAjaran` (string): Tahun ajaran saat siswa didaftarkan. Ini digunakan untuk memfilter data.
+        *   `fullName` (string): Nama lengkap siswa.
+        *   `nisn` (string): NISN siswa.
+        *   ...dan field data pribadi, alamat, serta keluarga lainnya.
+
+4.  **`correctionRequests`**
+    *   **Tujuan:** Menyimpan permintaan perbaikan data yang diajukan oleh pengguna non-admin.
+    *   **Struktur Dokumen:** Lihat `src/types/correction-request.ts` untuk struktur lengkap. Field utamanya adalah:
+        *   `studentId` (string): ID dokumen siswa yang datanya ingin diperbaiki.
+        *   `fieldToCorrect` (string): Nama field yang salah.
+        *   `newValue` (string): Nilai baru yang diusulkan.
+        *   `status` (string): 'pending', 'approved', atau 'rejected'.
+
+### c. Setup Lingkungan Lokal
+1.  **Unduh Kode:** Dapatkan kode sumber aplikasi ini.
+2.  **Install Dependensi:** Jalankan `npm install` di terminal.
+3.  **Buat File Environment:**
+    *   Buat file bernama `.env.local` di direktori utama proyek.
+    *   Salin kredensial dari proyek Firebase baru Anda (Settings > Project settings > General > Your apps > Web app) ke dalam file `.env.local`:
+        ```
+        NEXT_PUBLIC_FIREBASE_API_KEY="AIzaSy..."
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your-project-id.firebaseapp.com"
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="your-project-id.appspot.com"
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="1234567890"
+        NEXT_PUBLIC_FIREBASE_APP_ID="1:1234567890:web:abcdef123456"
+        ```
+4.  **Buat Akun Admin Pertama:**
+    *   Jalankan aplikasi secara lokal dengan `npm run dev`.
+    *   Karena belum ada pengguna, Anda tidak bisa login.
+    *   Buka Firebase Console > Authentication > Add user. Buat pengguna pertama Anda.
+    *   Salin `UID` pengguna yang baru dibuat.
+    *   Buka Firebase Console > Firestore Database. Buat koleksi `userRoles`, lalu buat dokumen pertama dengan ID adalah `UID` yang baru Anda salin.
+    *   Di dalam dokumen tersebut, tambahkan field `email` (string) dan `role` (string) dengan nilai 'admin'.
+5.  **Jalankan dan Login:** Sekarang Anda dapat login dengan akun yang baru dibuat dan Anda akan memiliki hak akses admin.
