@@ -119,3 +119,4 @@ Anda perlu membuat koleksi berikut secara manual atau melalui aplikasi:
     *   Buka Firebase Console > Firestore Database. Buat koleksi `userRoles`, lalu buat dokumen pertama dengan ID adalah `UID` yang baru Anda salin.
     *   Di dalam dokumen tersebut, tambahkan field `email` (string) dan `role` (string) dengan nilai 'admin'.
 5.  **Jalankan dan Login:** Sekarang Anda dapat login dengan akun yang baru dibuat dan Anda akan memiliki hak akses admin.
+# entridatasiswa_Baru
