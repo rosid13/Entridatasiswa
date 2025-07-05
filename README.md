@@ -121,3 +121,4 @@ Anda perlu membuat koleksi berikut secara manual atau melalui aplikasi:
 5.  **Jalankan dan Login:** Sekarang Anda dapat login dengan akun yang baru dibuat dan Anda akan memiliki hak akses admin.
 # entridatasiswa_Baru
 # Entridatasiswa
+# Entridatasiswa
