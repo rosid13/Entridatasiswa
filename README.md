@@ -119,6 +119,59 @@ Anda perlu membuat koleksi berikut secara manual atau melalui aplikasi:
     *   Buka Firebase Console > Firestore Database. Buat koleksi `userRoles`, lalu buat dokumen pertama dengan ID adalah `UID` yang baru Anda salin.
     *   Di dalam dokumen tersebut, tambahkan field `email` (string) dan `role` (string) dengan nilai 'admin'.
 5.  **Jalankan dan Login:** Sekarang Anda dapat login dengan akun yang baru dibuat dan Anda akan memiliki hak akses admin.
+
+---
+
+## 5. Panduan Unggah ke GitHub
+
+Ikuti langkah-langkah berikut untuk mengunduh proyek ini dan mengunggahnya ke repositori GitHub Anda.
+
+### Langkah 1: Unduh Kode Proyek
+1.  Dari antarmuka Firebase Studio, cari dan klik tombol **"Download"** atau **"Export"** untuk mengunduh seluruh kode proyek sebagai file `.zip`.
+2.  Ekstrak file `.zip` tersebut ke sebuah folder di komputer lokal Anda.
+
+### Langkah 2: Buat Repositori Baru di GitHub
+1.  Buka [GitHub](https://github.com) dan login ke akun Anda.
+2.  Klik tombol **"+"** di pojok kanan atas, lalu pilih **"New repository"**.
+3.  Beri nama repositori Anda (misalnya, `sistem-data-siswa`).
+4.  Pastikan repositori diatur sebagai **"Public"** atau **"Private"** sesuai kebutuhan Anda.
+5.  **Penting:** Jangan centang opsi "Add a README file", "Add .gitignore", atau "Choose a license", karena kita sudah memiliki file-file tersebut dari proyek yang diunduh.
+6.  Klik **"Create repository"**.
+
+### Langkah 3: Unggah Proyek ke GitHub
+1.  Buka terminal atau command prompt di komputer Anda.
+2.  Masuk ke direktori folder proyek yang sudah Anda ekstrak tadi menggunakan perintah `cd`. Contoh:
+    ```bash
+    cd path/to/your/project-folder
+    ```
+3.  Inisialisasi Git di dalam folder tersebut:
+    ```bash
+    git init
+    ```
+4.  Tambahkan semua file proyek ke Git:
+    ```bash
+    git add .
+    ```
+5.  Buat *commit* pertama Anda (simpanan pertama):
+    ```bash
+    git commit -m "Initial commit: Upload project Sistem Data Siswa"
+    ```
+6.  Kembali ke halaman repositori GitHub Anda. Salin URL repositori yang tersedia di bagian "…or push an existing repository from the command line".
+7.  Hubungkan folder lokal Anda ke repositori di GitHub:
+    ```bash
+    git remote add origin [URL_REPOSITORI_ANDA_DARI_GITHUB]
+    ```
+    *Ganti `[URL_REPOSITORI_ANDA_DARI_GITHUB]` dengan URL yang Anda salin.*
+8.  Ubah nama *branch* utama menjadi `main` (praktik standar saat ini):
+    ```bash
+    git branch -M main
+    ```
+9.  Unggah (*push*) kode Anda ke GitHub:
+    ```bash
+    git push -u origin main
+    ```
+
+Selesai! Sekarang seluruh kode proyek Anda sudah tersimpan dengan aman di GitHub.
 # entridatasiswa_Baru
 # Entridatasiswa
 # Entridatasiswa
