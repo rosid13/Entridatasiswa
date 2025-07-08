@@ -84,10 +84,6 @@
   }
   .app-wrapper {
     background-color: hsl(220, 15%, 20%);
-    background-image: url('/Leonardo_Phoenix_09_Abstract_background_showcasing_a_modern_dy_0_upscayl_2x_ultrasharp.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
     min-height: 100vh;
   }
 }
