@@ -152,7 +152,7 @@ export default function RequestsPage() {
     return (
         <div className="flex flex-col min-h-screen">
             <main className="flex-grow">
-                <header className="bg-card/70 backdrop-blur-md border-b sticky top-0 z-10">
+                <header className="bg-card border-b sticky top-0 z-10">
                     <div className="max-w-7xl mx-auto flex items-center gap-4 p-4 sm:p-6">
                         <Link href="/admin/dashboard" passHref>
                             <Button variant="outline" size="icon">
@@ -160,8 +160,8 @@ export default function RequestsPage() {
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">Permintaan Perbaikan</h1>
-                            <p className="text-white/80 mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
+                            <h1 className="text-4xl md:text-5xl font-bold text-foreground">Permintaan Perbaikan</h1>
+                            <p className="text-muted-foreground mt-2">Tinjau dan kelola permintaan perbaikan data dari pengguna.</p>
                         </div>
                     </div>
                 </header>
